@@ -1,0 +1,108 @@
+<template>
+  <div v-if="isFontSizeSet" class="marquee">
+    <div
+      class="marquee__content"
+      :style="{ animationDuration: animationSpeed }"
+    >
+      <img
+        v-for="(image, index) in images"
+        :key="index"
+        :src="image"
+        class="marquee__item"
+      />
+    </div>
+    <div
+      class="marquee__content"
+      :style="{ animationDuration: animationSpeed }"
+    >
+      <img
+        v-for="(image, index) in images"
+        :key="index + 1000"
+        :src="image"
+        class="marquee__item"
+      />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, watchEffect, onMounted, ref } from 'vue';
+
+const props = defineProps({
+  fontSize: {
+    type: String,
+    default: '16px',
+  },
+  images: {
+    type: Array,
+    default: () => [
+      "/assets/bein.png",
+      "/assets/espn.png",
+      "/assets/netflix.png",
+      "/assets/tbs.png",
+      "/assets/sky.png",
+      "/assets/hgtv.png",
+      "/assets/cn.png",
+      "/assets/NBC_logo_2022.svg",
+    ],
+  },
+  speed: {
+    type: Number,
+    default: 10, // Controls scrolling speed (in seconds)
+  },
+});
+
+const animationSpeed = computed(() => `${props.speed}s`);
+const isFontSizeSet = ref(false);
+
+onMounted(() => {
+  watchEffect(() => {
+    document.documentElement.style.setProperty(
+      '--baseFontSize',
+      props.fontSize
+    );
+    isFontSizeSet.value = true;
+  });
+});
+</script>
+
+<style scoped>
+.marquee {
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  gap: var(--gap);
+  --gap: 2rem;
+  padding: 10px 0;
+}
+
+.marquee__content {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-start;
+  min-width: 100%;
+  gap: var(--gap);
+  animation: scroll linear infinite;
+  margin-top: 20px;
+}
+
+.marquee__item {
+  max-height: 60px; 
+  margin-right: 20px;
+  transition: transform 0.2s ease-in-out;
+  padding: 6px;
+}
+
+.marquee__item:hover {
+  transform: scale(1.1);
+}
+
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+</style>
