@@ -1,8 +1,23 @@
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
+  vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          compact: true, // Enables compact JS output
+        },
+      },
+    },
+  },
+  nitro: {
+    compressPublicAssets: true, // Enables gzip & Brotli compression locally
+  },
   app:{
     head:{
+      htmlAttrs: {
+        lang: "fr", 
+      },
       title:"Platinium IPTV",
       link: [
         { rel: 'icon', href: '/images/favicon.png' },
@@ -18,7 +33,8 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
     '@primevue/nuxt-module',
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxt/image'
   ],
   primevue: {
       options: {

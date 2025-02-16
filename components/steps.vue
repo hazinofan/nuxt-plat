@@ -13,11 +13,7 @@
               <span class="font-bold text-purple-600 text-2xl"
                 >3 Étapes Faciles pour Commencer avec PLATINIUM IPTV</span
               >
-              <img
-                src="/assets/steps.png"
-                alt="Étapes d'utilisation"
-                class="w-full h-auto max-h-[800px]"
-              />
+              <NuxtImg src="/assets/steps.png" format="webp" alt="Étapes d'utilisation"/>
             </div>
           </div>
 
@@ -35,9 +31,9 @@
                   </span>
                 </div>
                 <div class="max-w-xs">
-                  <h3 class="mb-2 text-xl font-bold text-orange-800">
+                  <div class="mb-2 text-xl font-bold text-orange-800">
                     Choisissez votre abonnement
-                  </h3>
+                  </div>
                   <p class="text-lg text-gray-500 dark:text-black">
                     Choisissez votre formule d'abonnement IPTV Smarters et
                     téléchargez notre application sur votre appareil pour une
@@ -57,9 +53,9 @@
                   </span>
                 </div>
                 <div class="max-w-xs">
-                  <h3 class="mb-2 text-xl font-bold text-orange-800">
+                  <div class="mb-2 text-xl font-bold text-orange-800">
                     Effectuer le paiement sécurisé
-                  </h3>
+                  </div>
                   <p class="text-lg text-gray-500 dark:text-black">
                     Procédez via votre carte bancaire ou votre compte PayPal.
                     Attendez quelques minutes et recevez votre abonnement par
@@ -79,9 +75,9 @@
                   </span>
                 </div>
                 <div class="max-w-xs">
-                  <h3 class="mb-2 text-xl font-bold text-orange-800">
+                  <div class="mb-2 text-xl font-bold text-orange-800">
                     Profitez d'un accès instantané
-                  </h3>
+                  </div>
                   <p class="text-lg text-gray-500 dark:text-black">
                     Connectez-vous avec les informations d'identification de
                     votre compte et accédez instantanément à des milliers de

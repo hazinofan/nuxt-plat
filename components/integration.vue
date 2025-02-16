@@ -8,9 +8,10 @@
 
     <div class="row">
       <div class="steps-col">
-        <h3 class="flex gap-3 items-center" style="place-content: center">
+        <!-- ✅ Changed <h3> to <h2> -->
+        <h2 class="flex gap-3 items-center" style="place-content: center">
           <i class="pi pi-desktop text-xl"></i> Passer une commande
-        </h3>
+        </h2>
         <p>
           Accédez à notre service premium IPTV Smarters en seulement quelques
           clics, vous offrant une expérience immédiate et de qualité
@@ -19,9 +20,10 @@
       </div>
 
       <div class="steps-col">
-        <h3 class="flex gap-3 items-center" style="place-content: center">
+        <!-- ✅ Changed <h3> to <h2> -->
+        <h2 class="flex gap-3 items-center" style="place-content: center">
           <i class="pi pi-download text-xl"></i> Installation
-        </h3>
+        </h2>
         <p>
           Pour optimiser votre expérience avec votre abonnement IPTV,
           téléchargez simplement l'application Smart IPTV appropriée pour votre
@@ -30,9 +32,10 @@
       </div>
 
       <div class="steps-col">
-        <h3 class="flex gap-3 items-center" style="place-content: center">
-          <i class="pi pi-smile text-xl"></i> AMUSEZ-VOUS
-        </h3>
+        <!-- ✅ Changed <h3> to <h2> -->
+        <h2 class="flex gap-3 items-center" style="place-content: center">
+          <i class="pi pi-face-smile text-xl"></i> AMUSEZ-VOUS
+        </h2>
         <p>
           Explorez un vaste catalogue de milliers de chaînes et de vidéos, et
           plongez dans une expérience TV plus diversifiée et de meilleure
@@ -42,6 +45,7 @@
     </div>
   </section>
 </template>
+
   
   <script setup>
 import { onMounted } from "vue";

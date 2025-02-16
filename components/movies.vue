@@ -30,49 +30,55 @@ const props = defineProps({
   },
 });
 
+// ✅ Precompute alt texts using a computed property
+const imageAlts = computed(() => {
+  return props.images.map((image) => {
+    return image
+      .split('/').pop() // Extract file name
+      .split('.')[0] // Remove file extension
+      .replace(/_/g, ' ') // Replace underscores with spaces
+      .replace(/-/g, ' ') // Replace dashes with spaces
+      .toUpperCase(); // Convert to uppercase
+  });
+});
+
 const animationSpeed = computed(() => `${props.speed}s`);
 const isFontSizeSet = ref(false);
 
 onMounted(() => {
   watchEffect(() => {
-    document.documentElement.style.setProperty(
-      '--baseFontSize',
-      props.fontSize
-    );
+    document.documentElement.style.setProperty('--baseFontSize', props.fontSize);
     isFontSizeSet.value = true;
   });
 });
-
 </script>
-
 
 <template>
   <div v-if="isFontSizeSet" class="marquee">
-    <div
-      class="marquee__content"
-      :style="{ animationDuration: animationSpeed }"
-    >
-      <img
+    <div class="marquee__content" :style="{ animationDuration: animationSpeed }">
+      <NuxtImg
         v-for="(image, index) in images"
         :key="index"
         :src="image"
         class="marquee__item"
+        :alt="imageAlts[index]"
+        format="webp"
+        loading="lazy"
       />
     </div>
-    <div
-      class="marquee__content"
-      :style="{ animationDuration: animationSpeed }"
-    >
-      <img
+    <div class="marquee__content" :style="{ animationDuration: animationSpeed }">
+      <NuxtImg
         v-for="(image, index) in images"
         :key="index + 1000"
         :src="image"
         class="marquee__item"
+        :alt="imageAlts[index]"
+        format="webp"
+        loading="lazy"
       />
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .marquee {

@@ -12,24 +12,29 @@
           <i :class="`pi ${item.icon} text-2xl`"></i>
           <span>{{ item.label }}</span>
         </NuxtLink>
-        <button v-else @click="item.onClick" class="icon_home">
+        <button
+          v-else
+          @click="item.onClick"
+          class="icon_home"
+          :aria-label="item.label || 'Bouton de navigation'"
+        >
           <i :class="`pi ${item.icon} text-2xl`"></i>
-          <span>{{ item.label }}</span>
+          <span v-if="item.label" class="sr-only">{{ item.label }}</span>
         </button>
       </li>
     </ul>
 
     <!-- Cart Sidebar -->
     <div class="cart-sidebar" :class="{ open: isCartOpen }">
-      <img
+      <NuxtImg
         src="/assets/logo2.png"
+        format="webp"
         alt="Platinium IPTV Logo"
-        width="200"
-        class="ml-16"
       />
       <div class="cart-header">
-        <h3>Votre Panier</h3>
-        <button @click="toggleCart">
+        <!-- ✅ Changed <h3> to <h2> -->
+        <h2>Votre Panier</h2>
+        <button @click="toggleCart" aria-label="Fermer le panier">
           <i class="pi pi-times text-red-600 font-bold text-xl"></i>
         </button>
       </div>
@@ -56,14 +61,19 @@
 
       <!-- Cart Actions -->
       <div class="flex gap-3">
-        <button @click="clearCart" class="cart-clear-btn">
+        <button
+          @click="clearCart"
+          class="cart-clear-btn"
+          aria-label="Vider le panier"
+        >
           Vider le Panier
         </button>
+
         <NuxtLink
           to="/checkout"
           class="cart-checkout-btn"
           @click="toggleCart"
-          :disabled="!cartItems || cartItems.length === 0"
+          :aria-disabled="!cartItems || cartItems.length === 0"
         >
           Procéder au Paiement
         </NuxtLink>
@@ -71,6 +81,7 @@
     </div>
   </nav>
 </template>
+
 
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
