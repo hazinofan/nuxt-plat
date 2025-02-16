@@ -48,7 +48,7 @@ const props = defineProps({
   },
   speed: {
     type: Number,
-    default: 10, // Controls scrolling speed (in seconds)
+    default: 10, 
   },
 });
 

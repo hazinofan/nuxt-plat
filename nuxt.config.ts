@@ -3,7 +3,7 @@ import Aura from '@primevue/themes/aura';
 export default defineNuxtConfig({
   app:{
     head:{
-      title:"IrisGestion 2.0",
+      title:"Platinium IPTV",
       link: [
         { rel: 'icon', href: '/images/favicon.png' },
         {

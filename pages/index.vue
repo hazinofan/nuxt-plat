@@ -58,15 +58,26 @@
     <Caroussel :speed="20"/>
     <Integration />
     <Herosection />
+    <Movies :speed="25"/>
+    <pricing-cards />
+    <Elitecard />
+    <Steps />
+    <Faq />
+    <Footer />
   </div>
 </template>
 
 <script setup>
 import Anouncement from "~/components/anouncement.vue";
 import Caroussel from "~/components/Caroussel.vue";
+import Elitecard from "~/components/elitecard.vue";
+import Faq from "~/components/faq.vue";
+import Footer from "~/components/footer.vue";
 import Herosection from "~/components/Herosection.vue";
 import Integration from "~/components/integration.vue";
+import Movies from "~/components/movies.vue";
 import Navbar from "~/components/navbar.vue";
+import Steps from "~/components/steps.vue";
 
 
 </script>

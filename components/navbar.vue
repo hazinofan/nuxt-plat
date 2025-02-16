@@ -4,14 +4,18 @@
     <ul class="horizontal-navbar">
       <li v-for="(item, index) in navItems" :key="index">
         <NuxtLink
+          v-if="item.to"
           :to="item.to"
           class="icon_home"
           :class="{ active: route.path === item.to }"
-          @click="item.onClick"
         >
           <i :class="`pi ${item.icon} text-2xl`"></i>
           <span>{{ item.label }}</span>
         </NuxtLink>
+        <button v-else @click="item.onClick" class="icon_home">
+          <i :class="`pi ${item.icon} text-2xl`"></i>
+          <span>{{ item.label }}</span>
+        </button>
       </li>
     </ul>
 
@@ -26,13 +30,13 @@
       <div class="cart-header">
         <h3>Votre Panier</h3>
         <button @click="toggleCart">
-          <IoMdClose class="text-red-600 font-bold text-xl" />
+          <i class="pi pi-times text-red-600 font-bold text-xl"></i>
         </button>
       </div>
 
       <!-- Cart Items -->
       <div class="cart-items">
-        <template v-if="cartItems.length > 0">
+        <template v-if="cartItems && cartItems.length > 0">
           <div v-for="item in cartItems" :key="item.id" class="cart-item">
             <p>{{ item.name }}</p>
             <p class="font-semibold text-green-600">
@@ -59,7 +63,7 @@
           to="/checkout"
           class="cart-checkout-btn"
           @click="toggleCart"
-          :disabled="cartItems.length === 0"
+          :disabled="!cartItems || cartItems.length === 0"
         >
           Procéder au Paiement
         </NuxtLink>
@@ -67,19 +71,28 @@
     </div>
   </nav>
 </template>
-  
-  <script setup>
-import { ref, onMounted, watchEffect, computed } from "vue";
+
+<script setup>
+import { ref, computed, onMounted, watchEffect } from "vue";
 import { useRoute } from "vue-router";
-import { PrimeIcons } from "primevue/api";
-import "../assets/css/navbar.scss"
+import "../assets/css/navbar.scss";
+
+// ✅ Manually Define PrimeVue Icons
+const PrimeIcons = {
+  HOME: "pi pi-home",
+  SHOPPING_BAG: "pi pi-shopping-bag",
+  DESKTOP: "pi pi-desktop",
+  FILE: "pi pi-file",
+  SHOPPING_CART: "pi pi-shopping-cart",
+  SIGN_IN: "pi pi-sign-in",
+};
 
 // Nuxt Hooks
 const route = useRoute();
 
 // States
 const isCartOpen = ref(false);
-const cartItems = ref([]);
+const cartItems = ref([]); // ✅ Ensuring it's always initialized
 const currentLang = ref("fr");
 
 // Toggle the cart
@@ -87,14 +100,10 @@ const toggleCart = () => {
   isCartOpen.value = !isCartOpen.value;
 };
 
-// Language switch
-const toggleLanguage = () => {
-  currentLang.value = currentLang.value === "fr" ? "en" : "fr";
-};
-
 // Fetch cart items from localStorage
 const fetchCartItems = () => {
-  cartItems.value = JSON.parse(localStorage.getItem("cartItems")) || [];
+  const storedCart = localStorage.getItem("cartItems");
+  cartItems.value = storedCart ? JSON.parse(storedCart) : [];
 };
 
 // Calculate total price
@@ -126,12 +135,14 @@ const navItems = [
   { to: "/produits", icon: PrimeIcons.SHOPPING_BAG, label: "Produits" },
   { to: "/test-gratuit", icon: PrimeIcons.DESKTOP, label: "Test Gratuit" },
   { to: "/blogs", icon: PrimeIcons.FILE, label: "Blogs" },
-  { icon: PrimeIcons.SHOPPING_CART, label: "Panier", onClick: toggleCart },
+  { icon: PrimeIcons.SHOPPING_CART, onClick: toggleCart },
   { to: "/login", icon: PrimeIcons.SIGN_IN, label: "Login" },
 ];
 </script>
-  
-  
-  <style scoped>
+
+<style scoped>
+/* Ensure PrimeVue icons have correct styles */
+.pi {
+  font-size: 1.5rem;
+}
 </style>
-  
