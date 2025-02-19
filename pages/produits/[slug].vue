@@ -9,6 +9,7 @@ const activeTab = ref("details");
 const product = ref(null);
 const loading = ref(true);
 const errorMessage = ref(null);
+const value = ref("0"); 
 
 onMounted(async () => {
   try {
