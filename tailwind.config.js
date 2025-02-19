@@ -8,7 +8,11 @@ export default {
     './plugins/**/*.{js,ts}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        oswald: ['Oswald', 'sans-serif'],
+      }
+    },
   },
   plugins: [],
 }

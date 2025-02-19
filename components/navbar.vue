@@ -1,5 +1,6 @@
 <template>
   <nav>
+    <Toast />
     <!-- Horizontal Navbar -->
     <ul class="horizontal-navbar">
       <li v-for="(item, index) in navItems" :key="index">
@@ -33,50 +34,84 @@
       />
       <div class="cart-header">
         <!-- ✅ Changed <h3> to <h2> -->
-        <h2>Votre Panier</h2>
+        <h2 class="text-white">Votre Panier</h2>
         <button @click="toggleCart" aria-label="Fermer le panier">
           <i class="pi pi-times text-red-600 font-bold text-xl"></i>
         </button>
       </div>
 
       <!-- Cart Items -->
-      <div class="cart-items">
-        <template v-if="cartItems && cartItems.length > 0">
-          <div v-for="item in cartItems" :key="item.id" class="cart-item">
-            <p>{{ item.name }}</p>
-            <p class="font-semibold text-green-600">
-              {{ item.price }}€ x {{ item.quantity }}
-            </p>
+      <div class="cart-items p-4 bg-white rounded-lg">
+        <template v-if="cartItems.length > 0">
+          <div
+            v-for="item in cartItems"
+            :key="item.id"
+            class="cart-item flex items-center justify-between border-b py-3"
+          >
+            <!-- Left Side: Image & Info -->
+            <div class="flex items-center space-x-4">
+              <img
+                :src="item.photos"
+                class="w-16 h-16 object-cover rounded-md border"
+                alt="Product Image"
+              />
+            </div>
+
+            <div class="">
+              <div>
+                <p class="text-lg font-semibold text-center">{{ item.name }}</p>
+              </div>
+              <!-- Right Side: Price & Remove Button -->
+              <div class="flex items-center space-x-4 justify-self-center">
+                <p class="text-green-600 font-semibold">
+                  {{ item.price }}€ x {{ item.quantity }}
+                </p>
+                <button
+                  @click="removeFromCart(item.id)"
+                  class="p-2 text-red-600 hover:text-red-800 transition"
+                  title="Remove Item"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Price -->
+          <div class="text-right mt-4">
+            <p class="text-lg font-bold">Total: {{ totalPrice }}€</p>
+          </div>
+          <!-- Cart Actions -->
+          <div class="flex gap-3">
+            <Button
+              label="Vider le Panier"
+              class="p-button-outlined p-button-danger mt-8"
+              @click="clearCart"
+            />
+
+            <Button
+              label="Procéder au Paiement"
+              class="p-button-outlined p-button-success mt-8"
+              :disabled="!cartItems || cartItems.length === 0"
+              @click="
+                $router.push('/checkout');
+                toggleCart();
+              "
+            />
           </div>
         </template>
-        <p v-else>Panier Vide</p>
+
+        <!-- Empty Cart Message -->
+        <p v-else class="text-center text-gray-500 py-4">
+          🛒 Votre panier est vide
+        </p>
       </div>
 
       <!-- Cart Total -->
       <div class="cart-total">
-        <p class="text-lg font-semibold text-green-700">
+        <p class="text-lg font-semibold text-green-700 text-center" >
           Total: {{ totalPrice }}€
         </p>
-      </div>
-
-      <!-- Cart Actions -->
-      <div class="flex gap-3">
-        <button
-          @click="clearCart"
-          class="cart-clear-btn"
-          aria-label="Vider le panier"
-        >
-          Vider le Panier
-        </button>
-
-        <NuxtLink
-          to="/checkout"
-          class="cart-checkout-btn"
-          @click="toggleCart"
-          :aria-disabled="!cartItems || cartItems.length === 0"
-        >
-          Procéder au Paiement
-        </NuxtLink>
       </div>
     </div>
   </nav>
@@ -87,6 +122,7 @@
 import { ref, computed, onMounted, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import "../assets/css/navbar.scss";
+import { Toast } from "primevue";
 
 // ✅ Manually Define PrimeVue Icons
 const PrimeIcons = {
@@ -104,7 +140,7 @@ const route = useRoute();
 // States
 const isCartOpen = ref(false);
 const cartItems = ref([]); // ✅ Ensuring it's always initialized
-const currentLang = ref("fr");
+const toast = useToast()
 
 // Toggle the cart
 const toggleCart = () => {
@@ -115,6 +151,17 @@ const toggleCart = () => {
 const fetchCartItems = () => {
   const storedCart = localStorage.getItem("cartItems");
   cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+};
+
+const removeFromCart = (id) => {
+  cartItems.value = cartItems.value.filter((item) => item.id !== id);
+  localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
+  toast.add({
+    severity: "success",
+    summary: "Success",
+    detail: `Produit Supprimé Avec succès!`,
+    life: 3000,
+  });
 };
 
 // Calculate total price

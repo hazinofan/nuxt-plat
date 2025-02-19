@@ -367,7 +367,7 @@ a.icon_home.active {
 	position: fixed;
 	top: 0;
 	right: -300px; /* Initially hidden off-screen */
-	width: 365px; /* Adjust as necessary */
+	width: 397px; /* Adjust as necessary */
 	height: 100vh;
 	background-color: rgb(75, 5, 54);
 	box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.5);
@@ -385,8 +385,9 @@ a.icon_home.active {
 	justify-content: space-between;
 	align-items: center;
 	padding-bottom: 10px;
+	margin-top: 20px;
   }
-  
+
   .cart-items {
 	margin-top: 10px;
   }

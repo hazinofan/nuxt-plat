@@ -1,27 +1,28 @@
 <template>
-  <div class="">
+  <div>
     <Navbar />
-    <h1 class="text-3xl justify-self-center pt-10 font-semibold">
+    <h1 class="text-3xl text-center pt-10 font-semibold mb-10 px-4">
       Formulaire à remplir pour bénéficier de l'essai IPTV gratuit de 2 heures :
     </h1>
+
     <div
-      class="min-h-screen flex items-center justify-center bg-gradient-to-br"
+      class="min-h-screen flex items-center justify-center bg-gradient-to-br px-4"
     >
       <div
-        class="flex w-full max-w-5xl bg-white shadow-lg rounded-xl overflow-hidden"
+        class="flex flex-col md:flex-row w-full max-w-5xl bg-white shadow-lg rounded-xl overflow-hidden mb-24"
       >
         <!-- Left Panel -->
         <div
-          class="w-1/2 bg-gradient-to-br from-gray-900 to-black text-white p-10 flex flex-col justify-center"
+          class="w-full md:w-1/2 bg-gradient-to-br from-gray-900 to-black text-white p-10 flex flex-col justify-center"
         >
           <h1 class="text-2xl font-semibold text-purple-400 text-center">
             Formulaire à remplir pour bénéficier de l'essai IPTV gratuit de 2
             heures :
           </h1>
 
-          <ul class="mt-5 space-y-3 text-gray-300">
+          <ul class="mt-5 space-y-3 text-gray-300 text-sm md:text-base">
             <li>
-              <strong class="text-white text-xl"
+              <strong class="text-white text-lg"
                 >Procédure d'Activation :</strong
               >
             </li>
@@ -38,10 +39,10 @@
           </ul>
 
           <div class="mt-6">
-            <h2 class="text-2xl font-semibold text-red-500">
+            <h2 class="text-xl font-semibold text-red-500">
               Informations Utiles :
             </h2>
-            <p class="text-gray-300 mt-2 text-lg">
+            <p class="text-gray-300 mt-2 text-sm md:text-lg">
               <strong class="text-white">L'adresse MAC :</strong> une série
               unique de chiffres et de lettres (Exemple : 1b:10:c8:d2:84:e4) qui
               identifie votre appareil Smart IPTV TV.
@@ -49,8 +50,8 @@
           </div>
 
           <div class="mt-6">
-            <h2 class="text-2xl font-semibold text-red-500">Remarque :</h2>
-            <ul class="mt-2 text-gray-300 space-y-2">
+            <h2 class="text-xl font-semibold text-red-500">Remarque :</h2>
+            <ul class="mt-2 text-gray-300 space-y-2 text-sm md:text-base">
               <li>
                 ⚠️ Les comptes de démonstration seront suspendus pendant les
                 grands événements sportifs.
@@ -70,7 +71,7 @@
             <h2 class="text-xl font-semibold text-purple-500">
               Informations de Contact :
             </h2>
-            <p class="text-gray-300 mt-2">
+            <p class="text-gray-300 mt-2 text-sm md:text-base">
               📞 N'hésitez pas à nous contacter pour toute information
               complémentaire. Nos équipes sont disponibles 7 jours sur 7, 24
               heures sur 24.
@@ -79,8 +80,17 @@
         </div>
 
         <!-- Right Panel (Form) -->
-        <div class="w-1/2 bg-white p-10 flex flex-col justify-center">
-          <h2 class="text-2xl font-bold">Créer un compte</h2>
+        <div
+          class="w-full md:w-1/2 bg-white p-6 md:p-10 flex flex-col justify-center"
+        >
+          <img
+            src="/assets/logo2.png"
+            alt="Platinium IPTV"
+            class="w-36 md:w-52 mb-6 md:mb-10 mx-auto"
+          />
+          <h2 class="text-2xl font-bold text-center md:text-left">
+            Formulaire du Test :
+          </h2>
 
           <!-- Form -->
           <form @submit.prevent="submitForm" class="mt-6 space-y-6">
@@ -151,7 +161,7 @@
 
             <!-- Option Adult -->
             <div class="flex items-center space-x-3">
-              <label class="">OPTION ADULT :</label>
+              <label class="text-sm md:text-base">OPTION ADULT :</label>
               <RadioButton
                 v-model="form.optionAdult"
                 inputId="yes"
@@ -168,7 +178,7 @@
               <label for="no" class="ml-2">Non</label>
             </div>
 
-            <!-- Submit Button (Disabled until Checkbox is checked) -->
+            <!-- Submit Button -->
             <button
               class="px-10 w-full py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-red-500 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all"
               aria-label="Ajouter un produit"
@@ -182,6 +192,7 @@
     <Footer />
   </div>
 </template>
+
 
 <script setup>
 import { ref } from "vue";

@@ -5,13 +5,13 @@ export default defineNuxtConfig({
     build: {
       rollupOptions: {
         output: {
-          compact: true, // Enables compact JS output
+          compact: true,
         },
       },
     },
   },
   nitro: {
-    compressPublicAssets: true, // Enables gzip & Brotli compression locally
+    compressPublicAssets: true, 
   },
   app:{
     head:{

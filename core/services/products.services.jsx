@@ -1,30 +1,52 @@
 import axios from "axios";
 
-// Define the base URL for the backend API
 const BASE_URL = `http://localhost:3001/products`;
 
-// Get the token from localStorage
 const getAuthToken = () => localStorage.getItem("token");
+
+export const getProductBySlug = async (productName) => {
+  try {
+    if (!productName || typeof productName !== "string") {
+      throw new Error("Invalid product name provided for slug generation");
+    }
+
+    const slug = slugify(productName);
+    const response = await axios.get(`${BASE_URL}/slug/${slug}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching product by slug:", error);
+    throw error;
+  }
+};
+
+const slugify = (text) => {
+  if (!text || typeof text !== "string") return ""; // Return empty string if input is invalid
+  return text
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]+/g, "");
+};
 
 // Add a new product
 export const addProduct = async (productData) => {
   try {
-    console.log("Sending payload to API:", productData); // Log payload
+    productData.slug = slugify(productData.name);
+
+    console.log("Sending payload to API:", productData); 
     const response = await axios.post(`${BASE_URL}`, productData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
     });
-    console.log("API response:", response.data); // Log response
+    console.log("API response:", response.data); 
     return response.data;
   } catch (error) {
     console.error("Error in addProduct service:", error);
-    console.error("Error details:", error.response?.data); // Log backend error message
-    throw error; // Re-throw the error for the calling function to handle
+    console.error("Error details:", error.response?.data); 
+    throw error; 
   }
 };
-
 
 // Delete a product by ID
 export const deleteProduct = async (productId) => {
@@ -45,7 +67,7 @@ export const deleteProduct = async (productId) => {
 export const getProducts = async () => {
   try {
     const response = await axios.get(`${BASE_URL}`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Error fetching products:", error);
     throw error;
