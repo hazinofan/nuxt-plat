@@ -17,11 +17,14 @@ const products = ref([]);
 const loading = ref(false);
 const selectedType = ref(true);
 const toast = useToast();
+const cartItems = ref([])
 
-onMounted(() => {
-  AOS.init();
-  fetchProducts();
-});
+const openCart = () => {
+  if (process.client) {
+    window.dispatchEvent(new Event("open-cart"));
+  }
+};
+
 
 async function fetchProducts() {
   loading.value = true;
@@ -122,6 +125,59 @@ useHead({
     { rel: "canonical", href: "https://platinium-iptv.com/abonnements-iptv" },
   ],
 });
+
+const isCartOpen = ref(false);
+
+// Toggle the cart
+const toggleCart = () => {
+  isCartOpen.value = !isCartOpen.value;
+};
+
+// Fetch cart items from localStorage
+const fetchCartItems = () => {
+  const storedCart = localStorage.getItem("cartItems");
+  cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+};
+
+const removeFromCart = (id) => {
+  cartItems.value = cartItems.value.filter((item) => item.id !== id);
+  localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
+  toast.add({
+    severity: "success",
+    summary: "Success",
+    detail: `Produit Supprimé Avec succès!`,
+    life: 3000,
+  });
+};
+
+// Calculate total price
+const totalPrice = computed(() =>
+  cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
+);
+
+// Clear cart
+const clearCart = () => {
+  localStorage.removeItem("cartItems");
+  cartItems.value = [];
+};
+
+// Watch for localStorage changes
+onMounted(() => {
+  fetchCartItems();
+  window.addEventListener("storage", fetchCartItems);
+});
+
+watchEffect(() => {
+  if (isCartOpen.value) {
+    fetchCartItems();
+  }
+});
+
+onMounted(() => {
+  AOS.init();
+  fetchProducts();
+  fetchCartItems()
+});
 </script>
 
 
@@ -134,7 +190,7 @@ useHead({
         <h1>Nos Abonnements IPTV</h1>
       </div>
     </div>
-
+    
     <section class="content" data-aos="fade-down" data-aos-delay="400">
       <h2>Nos Abonnements IPTV</h2>
       <p>
@@ -142,8 +198,12 @@ useHead({
         chaînes françaises et internationales. Profitez d'une expérience de
         visionnage fluide et de haute qualité.
       </p>
+      <div class="card flex flex-wrap gap-4" style="float: inline-end; padding-right: 100px;">
+          <Button type="button" class="mt-6 " label="Votre Panier" icon="pi pi-shopping-cart" :badge="cartItems.length" @click="openCart" :style="{ background: '#ff5733',border:'1px solid #ff5733',  color: 'white' }"/>
+      </div>
     </section>
 
+    
     <!-- Toggle Switch for Switching Between "Single" and "Double" -->
     <div class="toggle-container">
       <label class="switch-label">Single</label>
@@ -155,10 +215,10 @@ useHead({
         ></label
       >
     </div>
-
+    
     <!-- Toast Component for Notifications -->
     <Toast />
-
+    
     <div class="container" data-aos="fade-down" data-aos-delay="400">
       <div
         v-for="product in filteredProducts"

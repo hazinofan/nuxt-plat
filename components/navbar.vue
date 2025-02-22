@@ -129,10 +129,10 @@
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
 import { useRoute } from "vue-router";
+import { useToast } from "primevue/usetoast";
 import "../assets/css/navbar.scss";
-import { Toast } from "primevue";
 
-// ✅ Manually Define PrimeVue Icons
+// ✅ Define Icons
 const PrimeIcons = {
   HOME: "pi pi-home",
   SHOPPING_BAG: "pi pi-shopping-bag",
@@ -142,25 +142,44 @@ const PrimeIcons = {
   SIGN_IN: "pi pi-sign-in",
 };
 
-// Nuxt Hooks
+// ✅ Nuxt Hooks
 const route = useRoute();
-
-// States
-const isCartOpen = ref(false);
-const cartItems = ref([]); // ✅ Ensuring it's always initialized
 const toast = useToast();
 
-// Toggle the cart
-const toggleCart = () => {
-  isCartOpen.value = !isCartOpen.value;
-};
+// ✅ States
+const isCartOpen = ref(false);
+const cartItems = ref([]);
 
-// Fetch cart items from localStorage
+// ✅ Fetch cart items from localStorage
 const fetchCartItems = () => {
   const storedCart = localStorage.getItem("cartItems");
   cartItems.value = storedCart ? JSON.parse(storedCart) : [];
 };
 
+// ✅ Toggle Cart
+const toggleCart = () => {
+  isCartOpen.value = !isCartOpen.value;
+};
+
+// ✅ Listen for Global "open-cart" Event
+onMounted(() => {
+  fetchCartItems();
+  window.addEventListener("storage", fetchCartItems);
+
+  // ✅ Listen for event from other components
+  window.addEventListener("open-cart", () => {
+    console.log("Cart opened from another component");
+    isCartOpen.value = true;
+  });
+});
+
+watchEffect(() => {
+  if (isCartOpen.value) {
+    fetchCartItems();
+  }
+});
+
+// ✅ Remove item from cart
 const removeFromCart = (id) => {
   cartItems.value = cartItems.value.filter((item) => item.id !== id);
   localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
@@ -172,30 +191,18 @@ const removeFromCart = (id) => {
   });
 };
 
-// Calculate total price
+// ✅ Calculate total price
 const totalPrice = computed(() =>
   cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
 );
 
-// Clear cart
+// ✅ Clear cart
 const clearCart = () => {
   localStorage.removeItem("cartItems");
   cartItems.value = [];
 };
 
-// Watch for localStorage changes
-onMounted(() => {
-  fetchCartItems();
-  window.addEventListener("storage", fetchCartItems);
-});
-
-watchEffect(() => {
-  if (isCartOpen.value) {
-    fetchCartItems();
-  }
-});
-
-// Navigation items with PrimeVue iconsa
+// ✅ Navigation items with PrimeVue icons
 const navItems = [
   { to: "/", icon: PrimeIcons.HOME, label: "Accueil" },
   { to: "/produits", icon: PrimeIcons.SHOPPING_BAG, label: "Produits" },

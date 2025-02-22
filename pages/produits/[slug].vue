@@ -1,4 +1,5 @@
 <script setup>
+import Breadcrumb from "primevue/breadcrumb"; 
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Navbar from "~/components/navbar.vue";
@@ -84,6 +85,7 @@ const addToCart = (product) => {
         <p className="translate-x-2">Retourner</p>
       </button>
     </NuxtLink>
+
     <!-- Loading State -->
     <p v-if="loading" class="text-center text-gray-500 text-xl mt-10">
       Chargement...

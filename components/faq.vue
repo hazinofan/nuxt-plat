@@ -45,7 +45,7 @@
             </button>
 
             <!-- FAQ Answer -->
-            <div :id="`faq-answer-${index}`" v-show="openQuestion === index">
+            <div :id="`faq-answer-${index}`" v-show="openQuestion === index" class=" px-10 py-5">
               {{ faqItem.answer }}
             </div>
           </div>
