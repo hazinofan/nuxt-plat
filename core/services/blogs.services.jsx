@@ -80,3 +80,14 @@ export const updateProject = async (projectId, updatedData) => {
     });
     return response.data;
 };
+
+export const getBlogBySlug = async (slug) => {
+    const token = getToken()
+    
+    const response = await axios.get(`${BASE_URL}/blogs/slug/${slug}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+    return response.data;
+}

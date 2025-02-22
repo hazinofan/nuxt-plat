@@ -16,11 +16,20 @@
         <button
           v-else
           @click="item.onClick"
-          class="icon_home"
+          class="icon_home relative"
           :aria-label="item.label || 'Bouton de navigation'"
         >
           <i :class="`pi ${item.icon} text-2xl`"></i>
           <span v-if="item.label" class="sr-only">{{ item.label }}</span>
+
+          <span
+            v-if="
+              item.icon === PrimeIcons.SHOPPING_CART && cartItems.length > 0
+            "
+            class="cart-badge"
+          >
+            {{ cartItems.length }}
+          </span>
         </button>
       </li>
     </ul>
@@ -33,7 +42,6 @@
         alt="Platinium IPTV Logo"
       />
       <div class="cart-header">
-        <!-- ✅ Changed <h3> to <h2> -->
         <h2 class="text-white">Votre Panier</h2>
         <button @click="toggleCart" aria-label="Fermer le panier">
           <i class="pi pi-times text-red-600 font-bold text-xl"></i>
@@ -109,7 +117,7 @@
 
       <!-- Cart Total -->
       <div class="cart-total">
-        <p class="text-lg font-semibold text-green-700 text-center" >
+        <p class="text-lg font-semibold text-green-700 text-center">
           Total: {{ totalPrice }}€
         </p>
       </div>
@@ -140,7 +148,7 @@ const route = useRoute();
 // States
 const isCartOpen = ref(false);
 const cartItems = ref([]); // ✅ Ensuring it's always initialized
-const toast = useToast()
+const toast = useToast();
 
 // Toggle the cart
 const toggleCart = () => {
@@ -187,13 +195,13 @@ watchEffect(() => {
   }
 });
 
-// Navigation items with PrimeVue icons
+// Navigation items with PrimeVue iconsa
 const navItems = [
   { to: "/", icon: PrimeIcons.HOME, label: "Accueil" },
   { to: "/produits", icon: PrimeIcons.SHOPPING_BAG, label: "Produits" },
   { to: "/test-gratuit", icon: PrimeIcons.DESKTOP, label: "Test Gratuit" },
   { to: "/blogs", icon: PrimeIcons.FILE, label: "Blogs" },
-  { icon: PrimeIcons.SHOPPING_CART, onClick: toggleCart },
+  { icon: PrimeIcons.SHOPPING_CART, onClick: toggleCart, label: "Panier" },
   { to: "/login", icon: PrimeIcons.SIGN_IN, label: "Login" },
 ];
 </script>
@@ -202,5 +210,26 @@ const navItems = [
 /* Ensure PrimeVue icons have correct styles */
 .pi {
   font-size: 1.5rem;
+}
+.icon_home .pi-shopping-cart {
+  color: white !important;
+}
+
+/* 🔴 Cart Badge - Small Red Notification Circle */
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
 }
 </style>
