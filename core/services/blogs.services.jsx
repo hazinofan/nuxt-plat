@@ -1,6 +1,7 @@
 import axios from "axios";
+import environement from "../environement";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = environement.ENGINE_URL;
 
 // Retrieve token from localStorage
 const getToken = () => localStorage.getItem("token");

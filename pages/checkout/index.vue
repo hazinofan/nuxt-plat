@@ -1,6 +1,7 @@
-<script setup>
-import { ref, onMounted, computed } from "vue";
+  <script setup>
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import axios from "axios";
 import Navbar from "~/components/navbar.vue";
 import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
@@ -12,66 +13,168 @@ const cartItems = ref([]);
 const totalPrice = ref(0);
 const selectedCountry = ref(null);
 const phoneCode = ref("");
+const loading = ref(false);
 
 const countries = ref([
   { name: "France", code: "+33" },
   { name: "Belgique", code: "+32" },
   { name: "Canada", code: "+1" },
   { name: "États-Unis", code: "+1" },
-  { name: "Mexique", code: "+52" },
+  { name: "Maroc", code: "+212" },
+  { name: "Algérie", code: "+213" },
+  { name: "Tunisie", code: "+216" },
+  { name: "Suisse", code: "+41" },
   { name: "Allemagne", code: "+49" },
+  { name: "Royaume-Uni", code: "+44" },
   { name: "Espagne", code: "+34" },
   { name: "Italie", code: "+39" },
-  { name: "Royaume-Uni", code: "+44" },
-  { name: "Suisse", code: "+41" },
+  { name: "Portugal", code: "+351" },
   { name: "Pays-Bas", code: "+31" },
   { name: "Suède", code: "+46" },
   { name: "Norvège", code: "+47" },
   { name: "Danemark", code: "+45" },
-  { name: "Portugal", code: "+351" },
   { name: "Finlande", code: "+358" },
   { name: "Grèce", code: "+30" },
-  { name: "Autriche", code: "+43" },
+  { name: "Turquie", code: "+90" },
+  { name: "Russie", code: "+7" },
+  { name: "Japon", code: "+81" },
+  { name: "Chine", code: "+86" },
+  { name: "Corée du Sud", code: "+82" },
+  { name: "Inde", code: "+91" },
+  { name: "Brésil", code: "+55" },
+  { name: "Mexique", code: "+52" },
+  { name: "Argentine", code: "+54" },
+  { name: "Australie", code: "+61" },
+  { name: "Nouvelle-Zélande", code: "+64" },
+  { name: "Afrique du Sud", code: "+27" },
+  { name: "Égypte", code: "+20" },
+  { name: "Arabie Saoudite", code: "+966" },
+  { name: "Émirats Arabes Unis", code: "+971" },
+  { name: "Qatar", code: "+974" },
+  { name: "Liban", code: "+961" },
 ]);
 
 onMounted(() => {
   try {
     const storedItems = localStorage.getItem("cartItems");
     cartItems.value = storedItems ? JSON.parse(storedItems) : [];
-    totalPrice.value = cartItems.value.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
+    totalPrice.value = cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0);
   } catch (error) {
     console.error("Erreur lors de la récupération du panier:", error);
     cartItems.value = [];
   }
 });
 
+
 const updatePhoneCode = () => {
-  const country = countries.value.find(
-    (c) => c.name === selectedCountry.value?.name
-  );
-  phoneCode.value = country ? country.code : "";
+  if (!selectedCountry.value) {
+    phoneCode.value = "";
+    return;
+  }
+  phoneCode.value = selectedCountry.value.code || "";
 };
 
-const handleOrderSubmit = (event) => {
+const handleOrderSubmit = async (event) => {
   event.preventDefault();
+  loading.value = true;
+
+  if (!selectedCountry.value || !selectedCountry.value.name) {
+    alert("Veuillez sélectionner un pays avant de passer la commande.");
+    loading.value = false;
+    return;
+  }
 
   const customerInfo = {
-    name: event.target.full_name.value,
-    email: event.target.email.value,
-    country: selectedCountry.value.name,
-    phone: phoneCode.value + " " + event.target.phone.value,
-    message: event.target.additional_message.value,
+    name: event.target.full_name?.value || "Nom inconnu",
+    email: event.target.email?.value || "Email inconnu",
+    country: selectedCountry.value ? selectedCountry.value.name : "Unknown",
+    phone: phoneCode.value + " " + (event.target.phone?.value || ""),
+    message: event.target.additional_message?.value || "Aucun message fourni",
   };
 
   localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
-  router.push("/thank-you");
+
+  const orderSummary = cartItems.value
+    .map((item) => `<li>${item.name} (x${item.quantity}) - ${item.price}€</li>`)
+    .join("");
+
+  try {
+    await axios.post("http://localhost:3001/mailer/send", {
+      recipients: ["support@platinium-iptv.com"],
+      subject: "Nouvelle Commande - Platinium IPTV",
+      html: `
+          <h1>Nouvelle Commande</h1>
+          <p><strong>Nom :</strong> ${customerInfo.full_name}</p>
+          <p><strong>Email :</strong> ${customerInfo.email}</p>
+          <p><strong>Pays :</strong> ${customerInfo.country}</p>
+          <p><strong>Téléphone :</strong> ${customerInfo.phone}</p>
+          <p><strong>Message :</strong> ${customerInfo.message || "N/A"}</p>
+          <h2>🛒 Détails de la commande :</h2>
+          <ul>${orderSummary}</ul>
+          <p><strong>Total :</strong> ${totalPrice.value}€</p>
+        `,
+    });
+
+    // 🚀 Send order confirmation to USER
+    await axios.post("http://localhost:3001/mailer/send", {
+      recipients: [customerInfo.email],
+      subject: "Confirmation de votre commande - Platinium IPTV",
+      html: `
+          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
+            <h1 style="color: #D32F2F;">Bonjour ${customerInfo.full_name},</h1>
+            <p>Merci pour votre commande chez <strong>Platinium IPTV</strong> !</p>
+            <p>Votre commande est en attente de paiement.</p>
+            <p>Vous recevrez bientôt une facture à régler par PayPal ou carte de crédit.</p>
+            <h2>🛒 Votre commande :</h2>
+            <ul>${orderSummary}</ul>
+            <p><strong>Total :</strong> ${totalPrice.value}€</p>
+            <hr style="border: 1px solid #ccc; margin: 20px 0;">
+            <table style="width: 100%; text-align: left;">
+              <tr>
+                <td>
+                  <img src="https://yourwebsite.com/logo.png" alt="Platinium IPTV Logo" width="150">
+                </td>
+                <td style="padding-left: 15px;">
+                  <p style="font-size: 14px; margin: 0;">
+                    <strong>Marcel Bielsa</strong><br>
+                    Directeur du Support Client et Commandes<br>
+                    <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">support@platinium-iptv.com</a><br>
+                    📞 <a href="tel:+1234567890" style="color: #D32F2F; text-decoration: none;">+123 456 7890</a>
+                  </p>
+                </td>
+              </tr>
+            </table>
+            <p style="font-size: 12px; color: #777;">
+              Cet e-mail est généré automatiquement, merci de ne pas y répondre.
+            </p>
+          </div>
+        `,
+    });
+
+    console.log("✅ Emails Sent Successfully");
+    toast.add({
+      severity: "success",
+      summary: "Commande Succès",
+      detail: "Votre Commande a été envoyée avec succès !",
+      life: 3000,
+    });
+    router.push("/thank-you");
+  } catch (error) {
+    console.error("❌ Erreur d'envoi:", error);
+    toast.add({
+      severity: "error",
+      summary: "Erreur",
+      detail: "❌ Une erreur est survenue, veuillez réessayer.",
+      life: 3000,
+    });
+  } finally {
+    loading.value = false; 
+  }
 };
 </script>
 
-<template>
+
+  <template>
   <div
     class="relative mx-auto w-full bg-cover bg-center"
     :style="{ backgroundImage: `url('/assets/bgg.jpg')` }"
@@ -116,16 +219,20 @@ const handleOrderSubmit = (event) => {
               class="w-full"
             />
 
-            <label for="country" class="text-md font-semibold">Pays: *</label>
-            <Dropdown
-              id="country"
-              v-model="selectedCountry"
-              :options="countries"
-              optionLabel="name"
-              placeholder="Sélectionnez un pays"
-              class="w-full"
-              @change="updatePhoneCode"
-            />
+            <div class="p-float-label">
+              <label for="country">Pays: *</label>
+              <Dropdown
+                id="country"
+                v-model="selectedCountry"
+                :options="countries"
+                optionLabel="name"
+                placeholder="Sélectionnez un pays"
+                class="w-full p-dropdown"
+                filter
+                required
+                @change="updatePhoneCode"
+              />
+            </div>
 
             <label for="phone" class="text-md font-semibold"
               >Téléphone : *</label
@@ -151,19 +258,23 @@ const handleOrderSubmit = (event) => {
                 justifyContent: 'center',
               }"
             >
-              <h1 class="text-2xl font-bold mb-4">
-                Paiement
-              </h1>
+              <h1 class="text-2xl font-bold mb-4">Paiement</h1>
               <div
                 class="bg-white-200 border-white border-2 p-4 rounded shadow-md"
               >
-                <h2 class="font-semibold mb-2">Facture à régler par PayPal ou carte de crédit</h2>
+                <h2 class="font-semibold mb-2">
+                  Facture à régler par PayPal ou carte de crédit
+                </h2>
                 <p class="text-muted-foreground text-black text-xl">
-                  Merci d'avoir choisi Platinium IPTV , votre commande est en attente de paiement. Vous recevrez une facture par email à régler par PayPal ou par carte de crédit.
+                  Merci d'avoir choisi Platinium IPTV , votre commande est en
+                  attente de paiement. Vous recevrez une facture par email à
+                  régler par PayPal ou par carte de crédit.
                 </p>
               </div>
               <p class="mt-4 text-sm text-muted-foreground">
-                  Vos données personnelles seront utilisées pour traiter votre commande, soutenir votre expérience sur ce site et à d'autres fins décrites dans notre
+                Vos données personnelles seront utilisées pour traiter votre
+                commande, soutenir votre expérience sur ce site et à d'autres
+                fins décrites dans notre
                 <a href="#" class="text-primary underline ml-1"
                   >Politique de confidentialité</a
                 >.
@@ -171,12 +282,35 @@ const handleOrderSubmit = (event) => {
             </div>
 
             <button
-            class="px-10 py-3 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all"
-            aria-label="Ajouter un produit"
-          >
-            <i class="pi pi-credit-card text-lg mr-2" ></i>
-            Passer La commande 
-          </button>
+              class="px-10 py-3 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center items-center"
+              :disabled="loading"
+              aria-label="Passer la commande"
+            >
+              <span v-if="loading" class="flex items-center">
+                <svg
+                  class="animate-spin h-5 w-5 mr-2 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 108 8h-4l3 3 3-3h-4a8 8 0 01-8 8z"
+                  ></path>
+                </svg>
+                Envoi en cours...
+              </span>
+              <span v-else>Passer La commande</span>
+            </button>
           </form>
         </div>
       </div>
@@ -195,7 +329,9 @@ const handleOrderSubmit = (event) => {
           ></div>
         </div>
         <div class="relative pt-20">
-          <h2 class="text-4xl font-oswald mb-10 font-bold text-white">Résumé de la commande</h2>
+          <h2 class="text-4xl font-oswald mb-10 font-bold text-white">
+            Résumé de la commande
+          </h2>
           <ul class="space-y-5 mt-4">
             <li v-if="cartItems.length === 0" class="text-white">
               Votre panier est vide.

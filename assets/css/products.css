@@ -228,6 +228,10 @@ a{
     .content{
       padding: 0;
     }
+
+    .button-display {
+      display: contents;
+    }
   }  
 
   .cartBtn {

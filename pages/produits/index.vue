@@ -198,7 +198,7 @@ onMounted(() => {
         chaînes françaises et internationales. Profitez d'une expérience de
         visionnage fluide et de haute qualité.
       </p>
-      <div class="card flex flex-wrap gap-4" style="float: inline-end; padding-right: 100px;">
+      <div class="card flex flex-wrap gap-4 button-display " style="float: inline-end; padding-right: 100px;">
           <Button type="button" class="mt-6 " label="Votre Panier" icon="pi pi-shopping-cart" :badge="cartItems.length" @click="openCart" :style="{ background: '#ff5733',border:'1px solid #ff5733',  color: 'white' }"/>
       </div>
     </section>

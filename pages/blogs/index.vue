@@ -105,7 +105,7 @@ useHead({
     },
 
     // Preconnect WebSocket (if used)
-    { rel: "preconnect", href: "wss://your-websocket-url" },
+    { rel: "preconnect", href: "wss://platinium-iptv.com" },
 
     // DNS Prefetch for Fallback
     { rel: "dns-prefetch", href: "https://your-api.com" },

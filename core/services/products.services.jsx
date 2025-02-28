@@ -1,6 +1,8 @@
 import axios from "axios";
+import environement from "../environement";
 
-const BASE_URL = `http://localhost:3001/products`;
+const ENGINE_URL = environement.ENGINE_URL
+const BASE_URL = `${ENGINE_URL}/products`;
 
 const getAuthToken = () => localStorage.getItem("token");
 
@@ -20,7 +22,7 @@ export const getProductBySlug = async (productName) => {
 };
 
 const slugify = (text) => {
-  if (!text || typeof text !== "string") return ""; // Return empty string if input is invalid
+  if (!text || typeof text !== "string") return "";
   return text
     .toLowerCase()
     .replace(/\s+/g, "-")

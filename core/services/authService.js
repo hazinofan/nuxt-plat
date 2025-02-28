@@ -1,8 +1,10 @@
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+import environement from "../environement";
+
+const API_URL = environement.ENGINE_URL;
 
 export const login = async (email, password) => {
   try {
-    const response = await fetch(`http://localhost:3001/auth/login`, {
+    const response = await fetch(`${API_URL}/auth/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
