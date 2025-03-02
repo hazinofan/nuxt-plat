@@ -1,7 +1,11 @@
 <template>
-  <div class="">
-    <!-- <Anouncement /> -->
+  <div>
+    <!-- Move Navbar outside the hero section -->
+    <Navbar />
+
     <div
+      data-aos="fade-down"
+      data-aos-delay="400"
       class="relative h-screen w-full flex flex-col items-center justify-center bg-cover bg-center"
       style="
         background-image: url('/assets/bg.webp');
@@ -15,14 +19,13 @@
       <!-- Content -->
       <div class="relative z-10 text-center text-white px-6 max-w-7xl">
         <!-- Logo -->
-        <div class="mb-6">
-          <NuxtImg src="/assets/logo2.png" format="webp" alt="Platinium IPTV Logo"/>
+        <div class="mb-6 justify-items-center">
+          <NuxtImg src="/assets/logo2.png" class="w-72 " format="webp" alt="Platinium IPTV Logo"/>
         </div>
 
         <!-- Main Title -->
         <h1 class="text-3xl md:text-5xl font-bold">
-          Découvrez PLATINIUM IPTV - Votre Abonnement IPTV Idéal pour IPTV
-          Smarters et Smart IPTV
+          Découvrez PLATINIUM IPTV - Votre Abonnement IPTV Idéal pour IPTV Smarters et Smart IPTV
         </h1>
 
         <!-- Subtitle -->
@@ -34,25 +37,27 @@
 
         <!-- Buttons -->
         <div class="mt-6 flex flex-col md:flex-row justify-center gap-4">
-          <button
+          <NuxtLink
+            to="/produits"
             class="btn flex items-center justify-center gap-2 text-white"
             aria-label="Commander votre abonnement IPTV"
           >
             <i class="pi pi-cart-arrow-down" style="font-size: 1rem"></i>
             Commandez votre Abonnement IPTV
-          </button>
+          </NuxtLink>
 
-          <button
+          <NuxtLink
+            to="/test-gratuit"
             class="btn flex items-center justify-center gap-2 text-white"
             aria-label="Essai gratuit IPTV"
           >
             <i class="pi pi-desktop" style="font-size: 1rem"></i>
             Essai Gratuit IPTV
-          </button>
+          </NuxtLink>
         </div>
       </div>
-      <Navbar />
     </div>
+
     <!-- Components -->
     <Caroussel :speed="20" />
     <Integration />
@@ -66,7 +71,9 @@
   </div>
 </template>
 
+
 <script setup>
+import { NuxtLink } from '#components';
 import { useHead } from '#imports'; 
 import Anouncement from "~/components/anouncement.vue";
 import Caroussel from "~/components/Caroussel.vue";

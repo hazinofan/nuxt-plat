@@ -7,6 +7,8 @@ import Dropdown from "primevue/dropdown";
 import InputText from "primevue/inputtext";
 import Textarea from "primevue/textarea";
 import Footer from "~/components/footer.vue";
+import { useToast } from "primevue/usetoast";
+import environement from "~/core/environement";
 
 const router = useRouter();
 const cartItems = ref([]);
@@ -14,6 +16,8 @@ const totalPrice = ref(0);
 const selectedCountry = ref(null);
 const phoneCode = ref("");
 const loading = ref(false);
+const toast = useToast()
+const ENGINE_URL = environement.ENGINE_URL
 
 const countries = ref([
   { name: "France", code: "+33" },
@@ -65,6 +69,12 @@ onMounted(() => {
   }
 });
 
+const form = ref({
+  fullName: "",
+  email: "",
+  phone: "",
+  message: "",
+});
 
 const updatePhoneCode = () => {
   if (!selectedCountry.value) {
@@ -85,12 +95,16 @@ const handleOrderSubmit = async (event) => {
   }
 
   const customerInfo = {
-    name: event.target.full_name?.value || "Nom inconnu",
-    email: event.target.email?.value || "Email inconnu",
-    country: selectedCountry.value ? selectedCountry.value.name : "Unknown",
-    phone: phoneCode.value + " " + (event.target.phone?.value || ""),
-    message: event.target.additional_message?.value || "Aucun message fourni",
+    name: form.value.fullName || "Nom inconnu",
+    email: form.value.email || "Email inconnu",
+    country: selectedCountry.value?.name || "Unknown",
+    phone: phoneCode.value + " " + (form.value.phone || ""),
+    message: form.value.message || "Aucun message fourni",
   };
+
+  console.log("Form Data:", form.value);
+  console.log("Country:", selectedCountry.value);
+  console.log("Phone:", phoneCode.value);
 
   localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
 
@@ -99,56 +113,55 @@ const handleOrderSubmit = async (event) => {
     .join("");
 
   try {
-    await axios.post("http://localhost:3001/mailer/send", {
+    await axios.post(`${ENGINE_URL}/mailer/send`, {
       recipients: ["support@platinium-iptv.com"],
       subject: "Nouvelle Commande - Platinium IPTV",
       html: `
-          <h1>Nouvelle Commande</h1>
-          <p><strong>Nom :</strong> ${customerInfo.full_name}</p>
-          <p><strong>Email :</strong> ${customerInfo.email}</p>
-          <p><strong>Pays :</strong> ${customerInfo.country}</p>
-          <p><strong>Téléphone :</strong> ${customerInfo.phone}</p>
-          <p><strong>Message :</strong> ${customerInfo.message || "N/A"}</p>
-          <h2>🛒 Détails de la commande :</h2>
-          <ul>${orderSummary}</ul>
-          <p><strong>Total :</strong> ${totalPrice.value}€</p>
-        `,
+        <h1>Nouvelle Commande</h1>
+        <p><strong>Nom :</strong> ${customerInfo.name}</p>
+        <p><strong>Email :</strong> ${customerInfo.email}</p>
+        <p><strong>Pays :</strong> ${customerInfo.country}</p>
+        <p><strong>Téléphone :</strong> ${customerInfo.phone}</p>
+        <p><strong>Message :</strong> ${customerInfo.message || "N/A"}</p>
+        <h2>🛒 Détails de la commande :</h2>
+        <ul>${orderSummary}</ul>
+        <p><strong>Total :</strong> ${totalPrice.value}€</p>
+      `,
     });
 
-    // 🚀 Send order confirmation to USER
-    await axios.post("http://localhost:3001/mailer/send", {
+    await axios.post(`${ENGINE_URL}/mailer/send`, {
       recipients: [customerInfo.email],
       subject: "Confirmation de votre commande - Platinium IPTV",
       html: `
-          <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
-            <h1 style="color: #D32F2F;">Bonjour ${customerInfo.full_name},</h1>
-            <p>Merci pour votre commande chez <strong>Platinium IPTV</strong> !</p>
-            <p>Votre commande est en attente de paiement.</p>
-            <p>Vous recevrez bientôt une facture à régler par PayPal ou carte de crédit.</p>
-            <h2>🛒 Votre commande :</h2>
-            <ul>${orderSummary}</ul>
-            <p><strong>Total :</strong> ${totalPrice.value}€</p>
-            <hr style="border: 1px solid #ccc; margin: 20px 0;">
-            <table style="width: 100%; text-align: left;">
-              <tr>
-                <td>
-                  <img src="https://yourwebsite.com/logo.png" alt="Platinium IPTV Logo" width="150">
-                </td>
-                <td style="padding-left: 15px;">
-                  <p style="font-size: 14px; margin: 0;">
-                    <strong>Marcel Bielsa</strong><br>
-                    Directeur du Support Client et Commandes<br>
-                    <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">support@platinium-iptv.com</a><br>
-                    📞 <a href="tel:+1234567890" style="color: #D32F2F; text-decoration: none;">+123 456 7890</a>
-                  </p>
-                </td>
-              </tr>
-            </table>
-            <p style="font-size: 12px; color: #777;">
-              Cet e-mail est généré automatiquement, merci de ne pas y répondre.
-            </p>
-          </div>
-        `,
+        <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
+          <h1 style="color: #D32F2F;">Bonjour ${customerInfo.name},</h1>
+          <p>Merci pour votre commande chez <strong>Platinium IPTV</strong> !</p>
+          <p>Votre commande est en attente de paiement.</p>
+          <p>Vous recevrez bientôt une facture à régler par PayPal ou carte de crédit.</p>
+          <h2>🛒 Votre commande :</h2>
+          <ul>${orderSummary}</ul>
+          <p><strong>Total :</strong> ${totalPrice.value}€</p>
+          <hr style="border: 1px solid #ccc; margin: 20px 0;">
+          <table style="width: 100%; text-align: left;">
+            <tr>
+              <td>
+                <img src="https://yourwebsite.com/logo.png" alt="Platinium IPTV Logo" width="150">
+              </td>
+              <td style="padding-left: 15px;">
+                <p style="font-size: 14px; margin: 0;">
+                  <strong>Marcel Bielsa</strong><br>
+                  Directeur du Support Client et Commandes<br>
+                  <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">support@platinium-iptv.com</a><br>
+                  📞 <a href="tel:+1234567890" style="color: #D32F2F; text-decoration: none;">+123 456 7890</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+          <p style="font-size: 12px; color: #777;">
+            Cet e-mail est généré automatiquement, merci de ne pas y répondre.
+          </p>
+        </div>
+      `,
     });
 
     console.log("✅ Emails Sent Successfully");
@@ -171,14 +184,16 @@ const handleOrderSubmit = async (event) => {
     loading.value = false; 
   }
 };
+
 </script>
 
 
   <template>
-  <div
+    <div
     class="relative mx-auto w-full bg-cover bg-center"
     :style="{ backgroundImage: `url('/assets/bgg.jpg')` }"
-  >
+    >
+    <Toast />
     <Navbar />
     <div class="absolute inset-0 bg-black opacity-15 z-0"></div>
     <div class="grid min-h-screen grid-cols-10 relative z-10">
@@ -204,6 +219,7 @@ const handleOrderSubmit = async (event) => {
               >Nom Complet : *</label
             >
             <InputText
+              v-model="form.fullName"
               id="name"
               name="full_name"
               required
@@ -212,6 +228,7 @@ const handleOrderSubmit = async (event) => {
 
             <label for="email" class="text-md font-semibold">Email : *</label>
             <InputText
+              v-model="form.email"
               id="email"
               name="email"
               type="email"
@@ -239,13 +256,14 @@ const handleOrderSubmit = async (event) => {
             >
             <div class="flex items-center">
               <span class="mr-2 text-xl">{{ phoneCode }}</span>
-              <InputText id="phone" name="phone" class="w-full" />
+              <InputText id="phone" v-model="form.phone" name="phone" class="w-full" />
             </div>
 
             <label for="message" class="text-md font-semibold"
               >Informations supplémentaires :</label
             >
             <Textarea
+              v-model="form.message"
               id="message"
               name="additional_message"
               rows="4"
@@ -282,7 +300,7 @@ const handleOrderSubmit = async (event) => {
             </div>
 
             <button
-              class="px-10 py-3 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center items-center"
+              class="px-10 py-3 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center"
               :disabled="loading"
               aria-label="Passer la commande"
             >

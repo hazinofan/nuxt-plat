@@ -20,6 +20,7 @@
     "axios": "^1.7.9",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.0",
+    "jwt-decode": "^4.0.0",
     "nuxt": "^3.15.4",
     "primeicons": "^7.0.0",
     "primevue": "^4.2.5",

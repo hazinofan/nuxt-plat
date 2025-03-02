@@ -2,13 +2,14 @@
 import { ref, onMounted, computed } from "vue";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useToast } from "primevue/usetoast";
 
 // Variables d'état
 const cartItems = ref([]);
 const orderNumber = Math.floor(Math.random() * (1000 - 500 + 1)) + 500;
 const customerInfo = ref({ name: "", email: "", phone: "", country: "" });
 const router = useRouter()
-const toast = useToast()
+const toast = useToast() 
 
 // Récupérer les données depuis le Local Storage
 onMounted(() => {

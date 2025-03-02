@@ -69,7 +69,7 @@ function animateCounter(counterRef, target) {
         </NuxtLink>
       </div>
       <div class="hero-image">
-        <NuxtImg src="/assets/product.png" format="webp" width="100" height="100" alt="IPTV Box"/>
+        <NuxtImg src="/assets/product.png" format="webp" width="250" height="250" alt="IPTV Box"/>
       </div>
     </div>
 
