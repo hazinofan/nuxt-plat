@@ -18,6 +18,7 @@
     "@vueuse/core": "^12.7.0",
     "aos": "^2.3.4",
     "axios": "^1.7.9",
+    "chart.js": "^4.4.8",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.0",
     "jwt-decode": "^4.0.0",

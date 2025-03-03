@@ -137,7 +137,7 @@ onMounted(() => {
           <Transition name="fade">
             <ul v-if="isUserMenuOpen" class="user-dropdown">
               <li>
-                <NuxtLink to="/profile" class="dropdown-item">
+                <NuxtLink to="/dashboard" class="dropdown-item">
                   <i class="pi pi-user"></i> Mon Profil
                 </NuxtLink>
               </li>
