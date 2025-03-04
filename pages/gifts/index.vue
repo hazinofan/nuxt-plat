@@ -7,6 +7,8 @@ const coupons = ref([]);
 const ENGINE = environement.ENGINE_URL;
 const userId = ref(null);
 const toast = useToast();
+const visible = ref(false);
+
 
 const fetchCoupons = async () => {
   try {
@@ -109,15 +111,46 @@ onMounted(async () => {
         Aucun coupon disponible pour le moment.
       </p>
     </div>
-    
-    <Stepper value="1" class="basis-[50rem] mt-44">
+
+    <Stepper value="1" class="basis-[50rem] mt-8">
       <StepList>
         <Step value="1">PLAT-GIFT 1</Step>
         <Step value="2">PLAT-GIFT 2</Step>
         <Step value="3">PLAT-GIFT 3</Step>
         <Step value="4">PLAT-GIFT 4</Step>
+        <Step value="4">PLAT-GIFT 5</Step>
       </StepList>
     </Stepper>
+
+    <div class="card flex justify-center">
+    <Drawer v-model:visible="visible" header="Récompenses Disponibles" > 
+      <ul class="list-disc pl-5">
+        <span class=" font-roboto text-sm font-semibold"> PLATINIUM CADEAU 1 :</span>
+        <li class="mt-2 mb-8 text-xl font-oswald"> Abonnement 1 mois gratuit</li>
+
+        <span class=" font-roboto text-sm font-semibold"> PLATINIUM CADEAU 2 :</span>
+        <li class="mt-2 text-xl font-oswald mb-8"> Réduction 35% sur tous les abonnements</li>
+
+        <span class=" font-roboto text-sm font-semibold"> PLATINIUM CADEAU 3 :</span>
+        <li class="mt-2 text-xl font-oswald mb-8"> Abonnement 3 mois gratuit</li>
+
+        <span class=" font-roboto text-sm font-semibold"> PLATINIUM CADEAU 4 :</span>
+        <li class="mt-2 text-xl font-oswald mb-8"> Abonnement 6 mois gratuit + 2 connexions</li>
+
+        <span class=" font-roboto text-sm font-semibold"> PLATINIUM CADEAU 5 :</span>
+        <li class="mt-2 text-xl font-oswald mb-8"> Abonnement double 12 mois + 3 mois</li>
+
+      </ul>
+    </Drawer>
+    <Button
+      icon="pi pi-arrow-right"
+      label="Voir les Récompenses Disponibles Pour moi"
+      class="mt-5"
+      @click="visible = true"
+    />
+  </div>
+
+
   </NuxtLayout>
 </template>
 

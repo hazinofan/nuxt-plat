@@ -1,63 +1,55 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
-import { useHead } from "#app"; // Nuxt 3 composable for head management
+import { ref, computed, onMounted, watchEffect, onUnmounted } from "vue";
+import { useHead } from "#imports";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import "../../assets/css/products.css";
 import { useToast } from "primevue/usetoast";
-import InputSwitch from "primevue/inputswitch";
-import Toast from "primevue/toast";
-import Steps from "~/components/steps.vue";
-import Movies from "~/components/movies.vue";
-import Navbar from "~/components/navbar.vue";
-import Footer from "~/components/footer.vue";
 import { getProducts } from "~/core/services/products.services";
 
 const products = ref([]);
 const loading = ref(false);
 const selectedType = ref(true);
 const toast = useToast();
-const cartItems = ref([])
+const cartItems = ref([]);
+const isCartOpen = ref(false);
 
-const openCart = () => {
-  if (process.client) {
-    window.dispatchEvent(new Event("open-cart"));
-  }
-};
-
-
+// ✅ Fetch Products
 async function fetchProducts() {
   loading.value = true;
   try {
     const response = await getProducts();
     products.value = response;
   } catch (error) {
-    console.error(error, "error fetching products");
+    console.error("Error fetching products:", error);
   } finally {
     loading.value = false;
   }
 }
 
-// Computed property to filter products based on type
-const filteredProducts = computed(() => {
-  return products.value.filter((product) =>
-    selectedType.value
-      ? product.display === "Double"
-      : product.display === "Single"
-  );
-});
+// ✅ Fetch Cart Items (Client-Side Only)
+const fetchCartItems = () => {
+  if (process.client) {
+    const storedCart = localStorage.getItem("cartItems");
+    cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+  }
+};
 
+// ✅ Add Product to Cart (Client-Side Only)
 const addToCart = (product) => {
-  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-  const existingItem = cartItems.find((item) => item.id === product.id);
+  if (!process.client) return;
 
+  const storedCart = localStorage.getItem("cartItems");
+  const cart = storedCart ? JSON.parse(storedCart) : [];
+
+  const existingItem = cart.find((item) => item.id === product.id);
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
-    cartItems.push({ ...product, quantity: 1 });
+    cart.push({ ...product, quantity: 1 });
   }
 
-  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  localStorage.setItem("cartItems", JSON.stringify(cart));
   window.dispatchEvent(new Event("storage"));
 
   toast.add({
@@ -66,7 +58,55 @@ const addToCart = (product) => {
     detail: `${product.name} has been added to the cart!`,
     life: 3000,
   });
+
+  fetchCartItems(); 
 };
+
+
+// ✅ Computed Property for Total Price
+const totalPrice = computed(() =>
+  cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
+);
+
+// ✅ Clear Cart (Client-Side Only)
+const clearCart = () => {
+  if (!process.client) return;
+
+  localStorage.removeItem("cartItems");
+  cartItems.value = [];
+};
+
+// ✅ Watch for Local Storage Changes
+watchEffect(() => {
+  if (isCartOpen.value && process.client) {
+    fetchCartItems();
+  }
+});
+
+// ✅ Cleanup Storage Event Listener
+onUnmounted(() => {
+  if (process.client) {
+    window.removeEventListener("storage", fetchCartItems);
+  }
+});
+
+// ✅ Fetch Data on Mount (Only Client-Side)
+onMounted(() => {
+  if (process.client) {
+    AOS.init();
+    fetchProducts();
+    fetchCartItems();
+    window.addEventListener("storage", fetchCartItems);
+  }
+});
+
+const filteredProducts = computed(() => {
+  return products.value.filter((product) =>
+    selectedType.value
+      ? product.display === "Double"
+      : product.display === "Single"
+  );
+});
 
 // ✅ Define meta tags dynamically using useHead()
 useHead({
@@ -125,59 +165,6 @@ useHead({
     { rel: "canonical", href: "https://platinium-iptv.com/abonnements-iptv" },
   ],
 });
-
-const isCartOpen = ref(false);
-
-// Toggle the cart
-const toggleCart = () => {
-  isCartOpen.value = !isCartOpen.value;
-};
-
-// Fetch cart items from localStorage
-const fetchCartItems = () => {
-  const storedCart = localStorage.getItem("cartItems");
-  cartItems.value = storedCart ? JSON.parse(storedCart) : [];
-};
-
-const removeFromCart = (id) => {
-  cartItems.value = cartItems.value.filter((item) => item.id !== id);
-  localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
-  toast.add({
-    severity: "success",
-    summary: "Success",
-    detail: `Produit Supprimé Avec succès!`,
-    life: 3000,
-  });
-};
-
-// Calculate total price
-const totalPrice = computed(() =>
-  cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
-);
-
-// Clear cart
-const clearCart = () => {
-  localStorage.removeItem("cartItems");
-  cartItems.value = [];
-};
-
-// Watch for localStorage changes
-onMounted(() => {
-  fetchCartItems();
-  window.addEventListener("storage", fetchCartItems);
-});
-
-watchEffect(() => {
-  if (isCartOpen.value) {
-    fetchCartItems();
-  }
-});
-
-onMounted(() => {
-  AOS.init();
-  fetchProducts();
-  fetchCartItems()
-});
 </script>
 
 
@@ -190,7 +177,7 @@ onMounted(() => {
         <h1>Nos Abonnements IPTV</h1>
       </div>
     </div>
-    
+
     <section class="content" data-aos="fade-down" data-aos-delay="400">
       <h2>Nos Abonnements IPTV</h2>
       <p>
@@ -198,12 +185,26 @@ onMounted(() => {
         chaînes françaises et internationales. Profitez d'une expérience de
         visionnage fluide et de haute qualité.
       </p>
-      <div class="card flex flex-wrap gap-4 button-display " style="float: inline-end; padding-right: 100px;">
-          <Button type="button" class="mt-6 " label="Votre Panier" icon="pi pi-shopping-cart" :badge="cartItems.length" @click="openCart" :style="{ background: '#ff5733',border:'1px solid #ff5733',  color: 'white' }"/>
+      <div
+        class="card flex flex-wrap gap-4 button-display"
+        style="float: inline-end; padding-right: 100px"
+      >
+        <Button
+          type="button"
+          class="mt-6"
+          label="Votre Panier"
+          icon="pi pi-shopping-cart"
+          :badge="cartItems.length"
+          @click="openCart"
+          :style="{
+            background: '#a65286',
+            border: '1px solid #a65286',
+            color: 'white',
+          }"
+        />
       </div>
     </section>
 
-    
     <!-- Toggle Switch for Switching Between "Single" and "Double" -->
     <div class="toggle-container">
       <label class="switch-label">Single</label>
@@ -215,10 +216,10 @@ onMounted(() => {
         ></label
       >
     </div>
-    
+
     <!-- Toast Component for Notifications -->
     <Toast />
-    
+
     <div class="container" data-aos="fade-down" data-aos-delay="400">
       <div
         v-for="product in filteredProducts"

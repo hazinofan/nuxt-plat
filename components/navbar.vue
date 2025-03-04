@@ -1,4 +1,3 @@
-
 <script setup>
 import { ref, computed, onMounted, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -27,16 +26,18 @@ const isUserMenuOpen = ref(false);
 const user = ref(null);
 const cartItems = ref([]);
 
-// ✅ Fetch User from Token
+// ✅ Fetch User from Token (Client-Side Only)
 const fetchUser = () => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
+  if (process.client) {
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-  try {
-    user.value = jwtDecode(token);
-    console.log("User Data:", user.value);
-  } catch (error) {
-    console.error("Invalid token", error);
+    try {
+      user.value = jwtDecode(token);
+      console.log("User Data:", user.value);
+    } catch (error) {
+      console.error("Invalid token", error);
+    }
   }
 };
 
@@ -56,17 +57,23 @@ const navItems = computed(() => [
     : { to: "/login", icon: PrimeIcons.SIGN_IN, label: "Login" },
 ]);
 
-// ✅ Logout Function
+// ✅ Logout Function (Clears User & Cart)
 const logout = () => {
-  localStorage.removeItem("token");
+  if (process.client) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("cartItems");
+  }
   user.value = null;
+  cartItems.value = [];
+
   toast.add({
     severity: "success",
     summary: "Déconnexion réussie",
     detail: "Vous êtes maintenant déconnecté.",
     life: 3000,
   });
-  router.push("/");
+
+  router.push("/"); // ✅ Ensure navbar updates after logout
 };
 
 // ✅ Toggle User Menu
@@ -74,25 +81,41 @@ const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
 };
 
-// ✅ Fetch cart items
+// ✅ Fetch Cart Items from Local Storage (Only on Client)
 const fetchCartItems = () => {
-  const storedCart = localStorage.getItem("cartItems");
-  cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+  if (process.client) {
+    const storedCart = localStorage.getItem("cartItems");
+    cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+  }
 };
 
-// ✅ Remove item from cart
+// ✅ Automatically Update Cart Items When `localStorage` Changes
+watchEffect(() => {
+  if (process.client) {
+    fetchCartItems();
+  }
+});
+
+// ✅ Remove Item from Cart
 const removeFromCart = (id) => {
   cartItems.value = cartItems.value.filter((item) => item.id !== id);
-  localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
+
+  if (process.client) {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems.value));
+  }
 };
 
-// ✅ Calculate total price
-const totalPrice = computed(() => cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0));
+// ✅ Calculate Total Price
+const totalPrice = computed(() =>
+  cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0)
+);
 
-// ✅ Clear cart
+// ✅ Clear Cart (Client-Side Only)
 const clearCart = () => {
-  localStorage.removeItem("cartItems");
-  cartItems.value = [];
+  if (process.client) {
+    localStorage.removeItem("cartItems");
+    cartItems.value = [];
+  }
 };
 
 // ✅ Toggle Cart
@@ -100,7 +123,7 @@ const toggleCart = () => {
   isCartOpen.value = !isCartOpen.value;
 };
 
-// ✅ Fetch data on mount
+// ✅ Fetch user data on mount (Client-Side Only)
 onMounted(() => {
   fetchUser();
   fetchCartItems();
@@ -110,30 +133,35 @@ onMounted(() => {
 
 
 <template>
-  <nav>
+  <nav class="relative bg-gray-900-">
     <Toast />
-    <!-- Horizontal Navbar -->
-    <ul class="horizontal-navbar">
-      <li v-for="(item, index) in navItems" :key="index">
+
+    <!-- ✅ Horizontal Navbar (Hidden in Mobile) -->
+    <ul class="horizontal-navbar hidden md:flex justify-center space-x-4">
+      <li v-for="(item, index) in navItems" :key="index" class="flex items-center">
         <NuxtLink
           v-if="item.to"
           :to="item.to"
-          class="icon_home"
+          class="icon_home flex items-center space-x-2"
           :class="{ active: route.path === item.to }"
         >
-          <i v-if="item.icon" :class="`pi ${item.icon} text-2xl`"></i>
-          <span v-if="item.label">{{ item.label }}</span>
+          <i v-if="item.icon" :class="`pi ${item.icon} text-lg sm:text-xl md:text-2xl`"></i>
+          <span v-if="item.label" class="text-xs sm:text-sm md:text-base hidden sm:block">
+            {{ item.label }}
+          </span>
         </NuxtLink>
 
-        <!-- User Avatar (if logged in) -->
+        <!-- ✅ User Profile (If Logged In) -->
         <div v-else-if="item.user" class="user-profile relative">
           <button @click="toggleUserMenu" class="flex items-center space-x-2">
             <Avatar :image="item.avatar" class="avatar" size="large" shape="circle" />
-            <span class="text-white font-semibold text-sm">{{ item.username }}</span>
-            <i class="pi pi-chevron-up text-white text-xs"></i>
+            <span class="text-white font-semibold text-sm hidden md:block">
+              {{ item.username }}
+            </span>
+            <i class="pi pi-chevron-down text-white text-xs"></i>
           </button>
 
-          <!-- Dropdown Menu (Opens Upwards) -->
+          <!-- ✅ Dropdown Menu -->
           <Transition name="fade">
             <ul v-if="isUserMenuOpen" class="user-dropdown">
               <li>
@@ -148,55 +176,61 @@ onMounted(() => {
           </Transition>
         </div>
 
+        <!-- ✅ Cart Button -->
         <button
           v-else
           @click="item.onClick"
           class="icon_home relative"
           :aria-label="item.label || 'Bouton de navigation'"
         >
-          <i :class="`pi ${item.icon} text-2xl`"></i>
-          <span v-if="item.label" class="sr-only">{{ item.label }}</span>
-
-          <span
-            v-if="
-              item.icon === PrimeIcons.SHOPPING_CART && cartItems.length > 0
-            "
-            class="cart-badge"
-          >
+          <i :class="`pi ${item.icon} text-lg sm:text-xl md:text-2xl`"></i>
+          <span v-if="item.icon === PrimeIcons.SHOPPING_CART && cartItems.length > 0"
+            class="cart-badge">
             {{ cartItems.length }}
           </span>
         </button>
       </li>
     </ul>
 
-    <!-- Cart Sidebar -->
+    <!-- ✅ Mobile Dropdown Menu -->
+    <Transition name="slide-fade">
+      <ul v-if="isMobileMenuOpen" class="mobile-menu md:hidden bg-gray-800 p-4 rounded-md">
+        <li v-for="(item, index) in navItems" :key="index" class="flex flex-col py-2">
+          <NuxtLink
+            v-if="item.to"
+            :to="item.to"
+            class="flex items-center space-x-2 text-white"
+            :class="{ active: route.path === item.to }"
+            @click="isMobileMenuOpen = false"
+          >
+            <i v-if="item.icon" :class="`pi ${item.icon} text-lg`"></i>
+            <span v-if="item.label">{{ item.label }}</span>
+          </NuxtLink>
+        </li>
+      </ul>
+    </Transition>
+
+    <!-- ✅ Cart Sidebar -->
     <div class="cart-sidebar" :class="{ open: isCartOpen }">
-      <NuxtImg src="/assets/logo2.png" format="webp" alt="Platinium IPTV Logo" />
-      <div class="cart-header">
+      <NuxtImg src="/assets/logo2.png" format="webp" alt="Platinium IPTV Logo" class="mx-auto"/>
+      <div class="cart-header flex justify-between">
         <h2 class="text-white">Votre Panier</h2>
         <button @click="toggleCart" aria-label="Fermer le panier">
           <i class="pi pi-times text-red-600 font-bold text-xl"></i>
         </button>
       </div>
 
-      <!-- Cart Items -->
+      <!-- ✅ Cart Items -->
       <div class="cart-items p-4 bg-white rounded-lg">
         <template v-if="cartItems.length > 0">
-          <div
-            v-for="item in cartItems"
-            :key="item.id"
-            class="cart-item flex items-center justify-between border-b py-3"
-          >
-            <div class="flex items-center space-x-4">
-              <img :src="item.photos" class="w-16 h-16 object-cover rounded-md border" alt="Product Image" />
-            </div>
+          <div v-for="item in cartItems" :key="item.id"
+            class="cart-item flex items-center justify-between border-b py-3">
+            <img :src="item.photos" class="w-16 h-16 object-cover rounded-md border"/>
             <div>
               <p class="text-lg font-semibold text-center">{{ item.name }}</p>
-              <div class="flex items-center space-x-4 justify-self-center">
-                <p class="text-green-600 font-semibold">
-                  {{ item.price }}€ x {{ item.quantity }}
-                </p>
-                <button @click="removeFromCart(item.id)" class="p-2 text-red-600 hover:text-red-800 transition" title="Remove Item">
+              <div class="flex items-center space-x-4">
+                <p class="text-green-600 font-semibold">{{ item.price }}€ x {{ item.quantity }}</p>
+                <button @click="removeFromCart(item.id)" class="p-2 text-red-600 hover:text-red-800">
                   🗑️
                 </button>
               </div>
@@ -207,14 +241,9 @@ onMounted(() => {
             <p class="text-lg font-bold">Total: {{ totalPrice }}€</p>
           </div>
 
-          <div class="flex gap-3">
-            <Button label="Vider le Panier" class="p-button-outlined p-button-danger mt-8" @click="clearCart" />
-            <Button
-              label="Procéder au Paiement"
-              class="p-button-outlined p-button-success mt-8"
-              :disabled="!cartItems || cartItems.length === 0"
-              @click="$router.push('/checkout'); toggleCart();"
-            />
+          <div class="flex flex-col gap-3 md:flex-row">
+            <Button label="Vider le Panier" class="p-button-outlined p-button-danger" @click="clearCart"/>
+            <Button label="Paiement" class="p-button-success" @click="$router.push('/checkout'); toggleCart();"/>
           </div>
         </template>
 
@@ -223,6 +252,7 @@ onMounted(() => {
     </div>
   </nav>
 </template>
+
 
 
 
@@ -238,8 +268,8 @@ onMounted(() => {
 /* 🔴 Cart Badge - Small Red Notification Circle */
 .cart-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
+  top: 5px;
+  right: -2px;
   background-color: red;
   color: white;
   font-size: 0.7rem;

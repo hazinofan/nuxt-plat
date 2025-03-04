@@ -1,23 +1,90 @@
 <script setup>
+import { jwtDecode } from "jwt-decode";
 import { ref, onMounted } from "vue";
 import Chart from "primevue/chart";
 import Fieldset from "primevue/fieldset";
+import environement from "~/core/environement";
 
 const chartData = ref(null);
 const chartOptions = ref(null);
+const userId = ref(null);
+const coupons = ref([]);
+const orders = ref([]);
+const ENGINE = environement.ENGINE_URL;
 
-const setChartData = () => {
+const fetchUser = () => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const userData = jwtDecode(token);
+    userId.value = userData.id;
+  } catch (error) {
+    console.error("Invalid token", error);
+  }
+};
+
+const fetchData = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token || !userId.value) return;
+
+    const response = await fetch(`${ENGINE}/users/${userId.value}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur de récupération des données");
+    }
+
+    const data = await response.json();
+    coupons.value = data.coupons || [];
+    orders.value = data.orders || [];
+
+    console.log("Fetched Orders:", orders.value); // Debugging Step ✅
+
+    processChartData(); // Update chart after fetching orders
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données", error);
+  }
+};
+
+// ✅ Process Orders to Count Orders per Month
+const processChartData = () => {
   const documentStyle = getComputedStyle(document.documentElement);
 
-  return {
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
+  // Initialize an array for 12 months (all set to 0)
+  const ordersPerMonth = Array(12).fill(0);
+
+  orders.value.forEach(order => {
+    if (order.created_at) { // ✅ Fix: Use `created_at` instead of `date`
+      const parsedDate = new Date(order.created_at); // Convert to Date Object
+      
+      if (!isNaN(parsedDate.getTime())) {
+        const monthIndex = parsedDate.getMonth(); // Get month (0 = Jan, 11 = Dec)
+        ordersPerMonth[monthIndex]++;
+      } else {
+        console.warn("Invalid date format:", order.created_at); // Debugging
+      }
+    } else {
+      console.warn("Order missing created_at:", order); // Debugging
+    }
+  });
+
+  console.log("Updated Orders per Month:", ordersPerMonth); // Debugging
+
+  chartData.value = {
+    labels: [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ],
     datasets: [
       {
-        label: "Nombre de commandes par mois ",
-        data: [2, 4, 5, 1, 8, 10, 40],
+        label: "Nombre de commandes par mois",
+        data: ordersPerMonth,
         fill: false,
-        borderColor:
-          documentStyle.getPropertyValue("--p-cyan-500") || "#06b6d4",
+        borderColor: documentStyle.getPropertyValue("--p-cyan-500") || "#06b6d4",
+        backgroundColor: documentStyle.getPropertyValue("--p-cyan-300") || "#22d3ee",
         tension: 0.4,
       },
     ],
@@ -27,10 +94,8 @@ const setChartData = () => {
 const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue("--p-text-color") || "#333";
-  const textColorSecondary =
-    documentStyle.getPropertyValue("--p-text-muted-color") || "#6b7280";
-  const surfaceBorder =
-    documentStyle.getPropertyValue("--p-content-border-color") || "#e5e7eb";
+  const textColorSecondary = documentStyle.getPropertyValue("--p-text-muted-color") || "#6b7280";
+  const surfaceBorder = documentStyle.getPropertyValue("--p-content-border-color") || "#e5e7eb";
 
   return {
     responsive: true,
@@ -63,11 +128,13 @@ const setChartOptions = () => {
   };
 };
 
-onMounted(() => {
-  chartData.value = setChartData();
+onMounted(async () => {
+  await fetchUser();
+  await fetchData();
   chartOptions.value = setChartOptions();
 });
 </script>
+
 
 <template>
   <NuxtLayout name="user">
@@ -82,9 +149,9 @@ onMounted(() => {
         >
           <div class="flex items-center">
             <i class="pi pi-receipt text-3xl mr-3"></i>
-            <h2 class="text-xl font-semibold">Nombre Total des Commandes</h2>
+            <h2 class="text-xl text-white font-roboto font-semibold">Nombre Total des Commandes</h2>
           </div>
-          <h2 class="text-3xl font-semibold">0</h2>
+          <h2 class="text-3xl text-white font-roboto font-semibold">{{ orders.length }}</h2>
         </div>
 
         <!-- Cadeaux Card -->
@@ -93,9 +160,9 @@ onMounted(() => {
         >
           <div class="flex items-center">
             <i class="pi pi-gift text-3xl mr-3"></i>
-            <h2 class="text-xl font-semibold">Nombre total des Cadeaux</h2>
+            <h2 class="text-xl text-white font-roboto font-semibold">Nombre total des Coupons</h2>
           </div>
-          <h2 class="text-3xl font-semibold">0</h2>
+          <h2 class="text-3xl text-white font-roboto font-semibold">{{ coupons.length }}</h2>
         </div>
       </div>
 

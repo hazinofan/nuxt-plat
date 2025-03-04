@@ -4,7 +4,7 @@ export default defineNuxtPlugin(() => {
   
     const connectWebSocket = () => {
       if (isRestored) return;
-      socket = new WebSocket("wss://your-websocket-url");
+      socket = new WebSocket("wss://platinium-iptv.com");
   
       socket.onopen = () => console.log("WebSocket Connected");
       socket.onmessage = (event) => console.log("Message:", event.data);

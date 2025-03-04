@@ -143,7 +143,7 @@ onMounted(() => {
           <NuxtLink
             class="flex items-center px-3 py-2 text-gray-700 rounded-lg transition-all duration-300 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             :class="isExpanded ? 'justify-start' : 'justify-center'"
-            to="/dashboard"
+            to="/settings"
           >
             <i class="pi pi-cog text-lg"></i>
             <p
@@ -157,7 +157,7 @@ onMounted(() => {
           <NuxtLink
             class="flex items-center px-3 py-2 text-gray-700 rounded-lg transition-all duration-300 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             :class="isExpanded ? 'justify-start' : 'justify-center'"
-            to="/dashboard"
+            to="/support"
           >
             <i class="pi pi-users text-lg"></i>
             <p
@@ -177,6 +177,20 @@ onMounted(() => {
           >
             Déconnexion
           </label>
+
+          <NuxtLink
+            class="flex items-center px-3 py-2 text-gray-700 rounded-lg transition-all duration-300 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"
+            :class="isExpanded ? 'justify-start' : 'justify-center'"
+            to="/"
+          >
+            <i class="pi pi-home text-lg"></i>
+            <p
+              class="ml-5 text-base font-roboto text-gray-600"
+              :class="isExpanded ? 'w-auto block' : 'w-0 hidden'"
+            >
+              Page D'accueil
+            </p>
+          </NuxtLink>
 
           <NuxtLink
             class="flex items-center px-3 py-2 text-gray-700 rounded-lg transition-all duration-300 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800"

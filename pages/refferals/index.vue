@@ -78,7 +78,6 @@ onMounted(() => {
       </p>
     </div>
 
-    <template>
       <div class="card">
         <Stepper value="1">
           <StepItem value="1">
@@ -207,7 +206,6 @@ onMounted(() => {
           </StepItem>
         </Stepper>
       </div>
-    </template>
 
     <div class="card flex justify-center mt-20">
       <Button
