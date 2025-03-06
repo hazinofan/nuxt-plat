@@ -30,16 +30,10 @@ body {
 	
 }
 
-li + li {
-	margin-left: 1.5rem;
-}
-
 a {
 	color: #FFF; 
 	text-decoration: none;
 	display: flex;
-	align-items: center;
-	justify-content: center;
 	border-radius: 6px;
 	position: relative;
 
@@ -290,10 +284,6 @@ summary {
 	left: 50%;
 	transform: translateX(-50%);
 	z-index: 9999;
-  }
-  
-  li + li {
-	margin-left: 1.5rem;
   }
   
   a.icon_home {

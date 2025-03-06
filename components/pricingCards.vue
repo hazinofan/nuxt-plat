@@ -1,7 +1,19 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { getProducts } from "~/core/services/products.services";
 import InputSwitch from "primevue/inputswitch";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
+const cartItems = ref([]); 
+const isDouble = ref(false);
+const products = ref([]);
+
+const fetchCartItems = () => {
+  if (!process.client) return;
+  const storedCart = localStorage.getItem("cartItems");
+  cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+};
 
 const addToCart = (product) => {
   if (!process.client) return;
@@ -17,7 +29,7 @@ const addToCart = (product) => {
   }
 
   localStorage.setItem("cartItems", JSON.stringify(cart));
-  window.dispatchEvent(new Event("storage"));
+  cartItems.value = cart;
 
   toast.add({
     severity: "success",
@@ -25,15 +37,19 @@ const addToCart = (product) => {
     detail: `${product.name} has been added to the cart!`,
     life: 3000,
   });
-
-  fetchCartItems(); 
 };
 
-// State
-const isDouble = ref(false);
-const products = ref([]);
+onMounted(() => {
+  fetchCartItems(); 
+  window.addEventListener("storage", fetchCartItems);
+});
 
-// Fetch products from API
+onUnmounted(() => {
+  window.removeEventListener("storage", fetchCartItems);
+});
+
+
+// ✅ Fetch Products from API
 async function fetchProducts() {
   try {
     const response = await getProducts();
@@ -43,21 +59,21 @@ async function fetchProducts() {
   }
 }
 
-// Compute displayed plans based on toggle switch
+// ✅ Filter Products Based on Toggle Switch
 const displayedPlans = computed(() => {
   return products.value
-    .filter(
-      (product) => product.display === (isDouble.value ? "Double" : "Single")
-    )
+    .filter((product) => product.display === (isDouble.value ? "Double" : "Single"))
     .slice(0, 3); // Limit to 3 products
 });
 
-// Fetch products when component mounts
+// ✅ Fetch products on mount
 onMounted(fetchProducts);
 </script>
 
+
 <template>
   <section class="py-24">
+    <Toast />
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div class="mb-12 text-center">
         <!-- ✅ Correct use of <h2> -->

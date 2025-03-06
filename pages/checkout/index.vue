@@ -149,12 +149,12 @@ const form = ref({
 });
 
 watchEffect(() => {
-  if (userId.value) {
+  if (userId.value && countries.value.length > 0) {
     form.value.fullName = loggedUser.value.full_name;
     form.value.email = loggedUser.value.email;
     form.value.phone = loggedUser.value.phone;
 
-    const userCountry = countries.find(
+    const userCountry = countries.value.find(
       (c) => c.name === loggedUser.value.country
     );
     if (userCountry) {
@@ -163,6 +163,7 @@ watchEffect(() => {
     }
   }
 });
+
 
 const updatePhoneCode = () => {
   if (!selectedCountry.value) {
@@ -316,6 +317,8 @@ const handleOrderSubmit = async (event) => {
 };
 
 onMounted(() => {
+  checkToken();
+  getAllUsers();
   try {
     const storedItems = localStorage.getItem("cartItems");
     cartItems.value = storedItems ? JSON.parse(storedItems) : [];
@@ -327,8 +330,6 @@ onMounted(() => {
     console.error("Erreur lors de la récupération du panier:", error);
     cartItems.value = [];
   }
-  checkToken();
-  getAllUsers();
 });
 </script>
 

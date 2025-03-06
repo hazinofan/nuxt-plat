@@ -116,44 +116,54 @@ onMounted(async () => {
       <h1 class="text-4xl font-oswald font-semibold">
         Votre historique de commandes :
       </h1>
+
+      <!-- ✅ Show message if no orders -->
+      <div v-if="orders.length === 0" class="text-center text-gray-600 p-6">
+        <p class="text-lg font-semibold">Aucune commande trouvée.</p>
+        <p class="text-gray-500">Vous n'avez pas encore passé de commande.</p>
+        <NuxtLink to="/produits" class="text-purple-500 font-semibold font-roboto hover:underline">
+          Explorer les produits →
+        </NuxtLink>
+      </div>
+
+      <!-- ✅ Show table if orders exist -->
+      <DataTable v-else :value="orders" stripedRows tableStyle="min-width: 50rem" :emptyMessage="'Aucune commande disponible'">
+        <!-- ID -->
+        <Column field="id" header="ID de Commande"></Column>
+
+        <!-- Produits -->
+        <Column field="products" header="Produits"></Column>
+
+        <!-- Prix -->
+        <Column field="total_price" header="Prix">
+          <template #body="slotProps">
+            {{ slotProps.data.total_price }} €
+          </template>
+        </Column>
+
+        <!-- Facture (Télécharger Button) -->
+        <Column field="invoice" header="Facture">
+          <template #body="slotProps">
+            <Button
+              icon="pi pi-download"
+              label="Télécharger"
+              class="p-button-sm p-button-primary"
+              @click="generateInvoice(slotProps.data)"
+            />
+          </template>
+        </Column>
+
+        <!-- Payé (Tag) -->
+        <Column field="paid" header="Payé">
+          <template #body="slotProps">
+            <Tag
+              :severity="slotProps.data.paid ? 'success' : 'warn'"
+              :value="slotProps.data.paid ? 'Payé' : 'En attente'"
+            />
+          </template>
+        </Column>
+      </DataTable>
     </div>
-
-    <DataTable :value="orders" stripedRows tableStyle="min-width: 50rem">
-      <!-- ID -->
-      <Column field="id" header="ID de Commande"></Column>
-
-      <!-- Produits -->
-      <Column field="products" header="Produits"></Column>
-
-      <!-- Prix -->
-      <Column field="total_price" header="Prix">
-        <template #body="slotProps">
-          {{ slotProps.data.total_price }} €
-        </template>
-      </Column>
-
-      <!-- Facture (Télécharger Button) -->
-      <Column field="invoice" header="Facture">
-        <template #body="slotProps">
-          <Button
-            icon="pi pi-download"
-            label="Télécharger"
-            class="p-button-sm p-button-primary"
-            @click="generateInvoice(slotProps.data)"
-          />
-        </template>
-      </Column>
-
-      <!-- Payé (Tag) -->
-      <Column field="paid" header="Payé">
-        <template #body="slotProps">
-          <Tag
-            :severity="slotProps.data.paid ? 'success' : 'warn'"
-            :value="slotProps.data.paid ? 'Payé' : 'En attente'"
-          />
-        </template>
-      </Column>
-      
-    </DataTable>
   </NuxtLayout>
 </template>
+

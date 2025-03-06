@@ -84,17 +84,17 @@ const toggleUserMenu = () => {
 // ✅ Fetch Cart Items from Local Storage (Only on Client)
 const fetchCartItems = () => {
   if (process.client) {
-    const storedCart = localStorage.getItem("cartItems");
-    cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+    try {
+      const storedCart = localStorage.getItem("cartItems");
+      cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+    } catch (error) {
+      console.error("Error parsing cart data:", error);
+      localStorage.removeItem("cartItems"); 
+      cartItems.value = [];
+    }
   }
 };
 
-// ✅ Automatically Update Cart Items When `localStorage` Changes
-watchEffect(() => {
-  if (process.client) {
-    fetchCartItems();
-  }
-});
 
 // ✅ Remove Item from Cart
 const removeFromCart = (id) => {
@@ -127,7 +127,15 @@ const toggleCart = () => {
 onMounted(() => {
   fetchUser();
   fetchCartItems();
+
+  window.addEventListener("storage", fetchCartItems);
 });
+
+onUnmounted(() => {
+  window.removeEventListener("storage", fetchCartItems);
+});
+
+
 </script>
 
 
@@ -166,11 +174,30 @@ onMounted(() => {
             <ul v-if="isUserMenuOpen" class="user-dropdown">
               <li>
                 <NuxtLink to="/dashboard" class="dropdown-item">
-                  <i class="pi pi-user"></i> Mon Profil
+                  <i class="pi pi-clipboard"></i> Dashboard
                 </NuxtLink>
               </li>
-              <li @click="logout" class="dropdown-item logout">
-                <i class="pi pi-sign-out"></i> Déconnexion
+              <li>
+                <NuxtLink to="/settings" class="dropdown-item">
+                  <i class="pi pi-cog"></i> Paramètres
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink to="/orders" class="dropdown-item">
+                  <i class="pi pi-credit-card"></i> Mes Commandes
+                </NuxtLink>
+              </li>
+
+              <Divider />
+
+              <li>
+                <NuxtLink to="/support" class="dropdown-item">
+                  <i class="pi pi-info-circle"></i> Support
+                </NuxtLink>
+              </li>
+
+              <li @click="logout" class="dropdown-item text-sm logout">
+                <i class="pi pi-sign-out text-xs"></i> Déconnexion
               </li>
             </ul>
           </Transition>
@@ -259,7 +286,7 @@ onMounted(() => {
 <style scoped>
 /* Ensure PrimeVue icons have correct styles */
 .pi {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 .icon_home .pi-shopping-cart {
   color: white !important;
@@ -313,14 +340,14 @@ onMounted(() => {
 /* Dropdown Menu */
 .user-dropdown {
   position: absolute;
-  bottom: 50px;
+  bottom: 57px;
   right: 0;
-  background: white;
+  background: rgba(255, 124, 200, 0.938);
   border-radius: 6px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 8px;
   z-index: 100;
-  min-width: 140px;
+  min-width: 175px;
   list-style: none;
 }
 
@@ -329,14 +356,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   padding: 8px;
-  font-size: 13px;
+  font-size: 15px;
   color: black;
   transition: background 0.2s;
   cursor: pointer;
 }
 
 .dropdown-item i {
-  margin-right: 6px;
+  margin-right: 10px;
 }
 
 .dropdown-item:hover {
