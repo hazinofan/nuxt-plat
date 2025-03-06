@@ -118,7 +118,7 @@ onMounted(async () => {
         <Step value="2">PLAT-GIFT 2</Step>
         <Step value="3">PLAT-GIFT 3</Step>
         <Step value="4">PLAT-GIFT 4</Step>
-        <Step value="4">PLAT-GIFT 5</Step>
+        <Step value="5">PLAT-GIFT 5</Step>
       </StepList>
     </Stepper>
 

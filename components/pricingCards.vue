@@ -3,6 +3,32 @@ import { ref, computed, onMounted } from "vue";
 import { getProducts } from "~/core/services/products.services";
 import InputSwitch from "primevue/inputswitch";
 
+const addToCart = (product) => {
+  if (!process.client) return;
+
+  const storedCart = localStorage.getItem("cartItems");
+  const cart = storedCart ? JSON.parse(storedCart) : [];
+
+  const existingItem = cart.find((item) => item.id === product.id);
+  if (existingItem) {
+    existingItem.quantity += 1;
+  } else {
+    cart.push({ ...product, quantity: 1 });
+  }
+
+  localStorage.setItem("cartItems", JSON.stringify(cart));
+  window.dispatchEvent(new Event("storage"));
+
+  toast.add({
+    severity: "success",
+    summary: "Success",
+    detail: `${product.name} has been added to the cart!`,
+    life: 3000,
+  });
+
+  fetchCartItems(); 
+};
+
 // State
 const isDouble = ref(false);
 const products = ref([]);
@@ -73,6 +99,8 @@ onMounted(fetchProducts);
             {{ plan.name }}
           </h2>
 
+          <img :src="plan.photos" :alt="plan.name">
+
           <div class="mb-6">
             <span class="text-4xl font-bold text-purple-600 tracking-tight"
               >€{{ plan.price }}</span
@@ -100,6 +128,7 @@ onMounted(fetchProducts);
           <button
             class="px-10 py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-red-500 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all"
             aria-label="Ajouter un produit"
+            @click="addToCart(plan)"
           >
             Ajouter un Produit
           </button>

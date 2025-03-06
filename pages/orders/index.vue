@@ -46,59 +46,63 @@ const fetchOrders = async () => {
 const generateInvoice = (order) => {
   const doc = new jsPDF();
 
-  // ✅ Add a company logo
-  const companyName = "Ma Boutique";
-  const logoUrl = "/assets/logo.png"; // Change this to your logo path
-  doc.addImage(logoUrl, "PNG", 150, 10, 40, 20); // X, Y, Width, Height
+  // ✅ Company Logo & Name
+  const companyName = "PLATINIUM IPTV";
+  const logoUrl = "/assets/logo.png"; // Update with your actual logo path
+  doc.addImage(logoUrl, "PNG", 140, 10, 50, 20); // X, Y, Width, Height
+
+  doc.setFontSize(22);
+  doc.setTextColor(40, 40, 40);
+  doc.text(companyName, 20, 20);
 
   // ✅ Invoice Title
-  doc.setFontSize(18);
-  doc.setTextColor(40, 40, 40);
-  doc.text("FACTURE", 20, 20);
+  doc.setFontSize(16);
+  doc.setTextColor(50, 50, 50);
+  doc.text("FACTURE D'ACHAT", 20, 40);
 
-  // ✅ Invoice Details
+  // ✅ Order Details Section
   doc.setFontSize(12);
-  doc.text(`ID Commande: ${order.id}`, 20, 40);
-  doc.text(`Client: ${order.clientName || "Non spécifié"}`, 20, 50);
-  doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 60);
+  doc.text(`ID Commande: ${order.id}`, 20, 55);
+  doc.text(`Client: ${order.clientName || "Non spécifié"}`, 20, 65);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 20, 75);
 
-  // ✅ Order Items Table
-  const productList =
-    Array.isArray(order.products) && order.products.length
-      ? order.products.map((product, index) => [
-          index + 1,
-          product.products || "Produit inconnu",
-        ])
-      : [["-", "Non spécifié", "-", "-", "-"]];
+  // ✅ Display Product List Without Table
+  doc.setFontSize(14);
+  doc.setTextColor(0, 122, 255);
+  doc.text("Produits commandés:", 20, 90);
+  doc.setTextColor(0);
 
-  autoTable(doc, {
-    startY: 70,
-    head: [["#", "Produit", "Quantité", "Prix Unitaire", "Total"]],
-    body: productList,
-    theme: "grid",
-    styles: { fontSize: 10, cellPadding: 4 },
-    headStyles: { fillColor: [0, 122, 255], textColor: 255, fontSize: 12 },
-  });
+  if (Array.isArray(order.products) && order.products.length) {
+    order.products.forEach((product, index) => {
+      doc.text(`• ${product}`, 25, 100 + index * 8); // Bullet points
+    });
+  } else {
+    doc.text("Aucun produit disponible", 25, 100);
+  }
 
-  // ✅ Payment Details
+  // ✅ Order Total & Payment Status
+  const lastProductY = 100 + (order.products.length * 8) + 10;
   doc.setFontSize(12);
-  doc.text(`Prix Total: ${order.total_price} €`, 20, doc.lastAutoTable.finalY + 10);
+  doc.text(`Prix Total: ${order.total_price} €`, 20, lastProductY);
   doc.text(
-    `Statut de paiement: ${order.paid ? " Payé" : " En attente"}`,
+    `Statut de paiement: ${order.paid ? "✅ Payé" : "⚠️ En attente"}`,
     20,
-    doc.lastAutoTable.finalY + 20
+    lastProductY + 10
   );
 
   // ✅ Footer / Signature
-  doc.text("Merci pour votre achat !", 20, doc.lastAutoTable.finalY + 40);
-  doc.text("Signature du vendeur", 20, doc.lastAutoTable.finalY + 60);
-  doc.line(20, doc.lastAutoTable.finalY + 65, 80, doc.lastAutoTable.finalY + 65); 
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text("Merci pour votre achat chez Platinium IPTV !", 20, lastProductY + 30);
+  doc.text("Signature du vendeur", 20, lastProductY + 50);
+  doc.line(20, lastProductY + 55, 80, lastProductY + 55); // Draw signature line
 
   // ✅ Save or Open PDF
   const pdfBlob = doc.output("blob");
   const pdfUrl = URL.createObjectURL(pdfBlob);
   window.open(pdfUrl, "_blank");
 };
+
 
 onMounted(async () => {
   await fetchUser();

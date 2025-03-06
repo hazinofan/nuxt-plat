@@ -1,6 +1,7 @@
   <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import Navbar from "~/components/navbar.vue";
 import Dropdown from "primevue/dropdown";
@@ -9,6 +10,7 @@ import Textarea from "primevue/textarea";
 import Footer from "~/components/footer.vue";
 import { useToast } from "primevue/usetoast";
 import environement from "~/core/environement";
+import { createOrder } from "~/core/services/platUsers.auth.service";
 
 const router = useRouter();
 const cartItems = ref([]);
@@ -16,8 +18,13 @@ const totalPrice = ref(0);
 const selectedCountry = ref(null);
 const phoneCode = ref("");
 const loading = ref(false);
-const toast = useToast()
-const ENGINE_URL = environement.ENGINE_URL
+const userId = ref(null);
+const toast = useToast();
+const couponError = ref("");
+const allCoupons = ref([]);
+const showWarning = ref(false);
+const discount = ref(null);
+const ENGINE_URL = environement.ENGINE_URL;
 
 const countries = ref([
   { name: "France", code: "+33" },
@@ -58,22 +65,103 @@ const countries = ref([
   { name: "Liban", code: "+961" },
 ]);
 
-onMounted(() => {
-  try {
-    const storedItems = localStorage.getItem("cartItems");
-    cartItems.value = storedItems ? JSON.parse(storedItems) : [];
-    totalPrice.value = cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0);
-  } catch (error) {
-    console.error("Erreur lors de la récupération du panier:", error);
-    cartItems.value = [];
+const checkToken = () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    showWarning.value = true;
+    return;
   }
+
+  try {
+    const decodedToken = jwtDecode(token);
+    userId.value = decodedToken.id;
+
+    loggedUser.value.full_name = decodedToken.full_name;
+    loggedUser.value.country = decodedToken.country;
+    loggedUser.value.phone = decodedToken.tel;
+    loggedUser.value.email = decodedToken.email;
+
+    const currentTime = Math.floor(Date.now() / 1000);
+    if (decodedToken.exp < currentTime) {
+      showWarning.value = true;
+    }
+  } catch (error) {
+    showWarning.value = false;
+  }
+};
+
+async function getAllUsers() {
+  loading.value = true;
+  try {
+    const response = await fetch(`${ENGINE_URL}/users`);
+    const data = await response.json();
+    console.log(data, "users");
+    allCoupons.value = data.flatMap((user) => user.coupons || []);
+    console.log(allCoupons.value, "all coupons");
+    return allCoupons;
+  } catch (error) {
+    console.error("❌ Error fetching users:", error);
+    return [];
+  } finally {
+    loading.value = false;
+  }
+}
+
+const applyCoupon = async () => {
+  const enteredCoupon = form.value.couponCode.trim().toUpperCase();
+  const coupon = allCoupons.value.find((c) => c.code === enteredCoupon);
+
+  if (!coupon) {
+    discount.value = 0;
+    couponError.value = "❌ Coupon n'est pas valide ou a expiré";
+    return;
+  }
+
+  const expiryTimestamp = new Date(coupon.expiry_date).getTime();
+  const currentTimestamp = Date.now();
+
+  if (coupon.status !== "active" || expiryTimestamp < currentTimestamp) {
+    discount.value = 0;
+    couponError.value = "❌ Coupon n'est pas valide ou a expiré";
+    return;
+  }
+
+  discount.value = (totalPrice.value * coupon.discount) / 100;
+  couponError.value = "";
+};
+
+const loggedUser = ref({
+  full_name: "",
+  email: "",
+  phone: "",
+  country: "",
 });
+
+console.log("logged ", loggedUser.value);
 
 const form = ref({
   fullName: "",
   email: "",
   phone: "",
   message: "",
+  couponCode: "",
+});
+
+watchEffect(() => {
+  if (userId.value) {
+    form.value.fullName = loggedUser.value.full_name;
+    form.value.email = loggedUser.value.email;
+    form.value.phone = loggedUser.value.phone;
+
+    const userCountry = countries.find(
+      (c) => c.name === loggedUser.value.country
+    );
+    if (userCountry) {
+      selectedCountry.value = userCountry;
+      phoneCode.value = userCountry.code;
+    }
+  }
 });
 
 const updatePhoneCode = () => {
@@ -94,6 +182,7 @@ const handleOrderSubmit = async (event) => {
     return;
   }
 
+  // ✅ Collect customer information
   const customerInfo = {
     name: form.value.fullName || "Nom inconnu",
     email: form.value.email || "Email inconnu",
@@ -102,19 +191,53 @@ const handleOrderSubmit = async (event) => {
     message: form.value.message || "Aucun message fourni",
   };
 
-  console.log("Form Data:", form.value);
-  console.log("Country:", selectedCountry.value);
-  console.log("Phone:", phoneCode.value);
-
   localStorage.setItem("customerInfo", JSON.stringify(customerInfo));
 
+  // ✅ Order Summary
   const orderSummary = cartItems.value
     .map((item) => `<li>${item.name} (x${item.quantity}) - ${item.price}€</li>`)
     .join("");
 
   try {
+    console.log(userId.value, "User ID Value");
+
+    if (userId.value) {
+      // ✅ Authenticated user → Create order in backend
+      const orderResponse = await createOrder(
+        userId.value,
+        totalPrice.value,
+        cartItems.value.map((item) => item.name)
+      );
+      console.log(orderResponse, "✅ Order successfully created!");
+    }
+
+    // ✅ Clear cart after order
+    cartItems.value = [];
+
+    // ✅ DELETE COUPON AFTER SUCCESSFUL ORDER
+    const enteredCoupon = form.value.couponCode.trim().toUpperCase();
+    const coupon = allCoupons.value.find((c) => c.code === enteredCoupon);
+
+    if (coupon) {
+      try {
+        const token = localStorage.getItem("token");
+        await axios.delete(
+          `${ENGINE_URL}/users/${userId.value}/coupons/${coupon.id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        allCoupons.value = allCoupons.value.filter((c) => c.id !== coupon.id);
+        console.log(`✅ Coupon ${coupon.code} deleted successfully.`);
+      } catch (error) {
+        console.error("❌ Error deleting coupon:", error.message);
+      }
+    }
+
+    // ✅ Send Email to Admin (You)
     await axios.post(`${ENGINE_URL}/mailer/send`, {
-      recipients: ["support@platinium-iptv.com"],
+      recipients: ["support@platinium-iptv.com"], // 📩 Admin Email
       subject: "Nouvelle Commande - Platinium IPTV",
       html: `
         <h1>Nouvelle Commande</h1>
@@ -126,11 +249,15 @@ const handleOrderSubmit = async (event) => {
         <h2>🛒 Détails de la commande :</h2>
         <ul>${orderSummary}</ul>
         <p><strong>Total :</strong> ${totalPrice.value}€</p>
+        <p>🔔 <strong>Type de Commande :</strong> ${
+          userId.value ? "Utilisateur Authentifié" : "Commande Invité"
+        }</p>
       `,
     });
 
+    // ✅ Send Confirmation Email to User
     await axios.post(`${ENGINE_URL}/mailer/send`, {
-      recipients: [customerInfo.email],
+      recipients: [customerInfo.email], // 📩 User Email
       subject: "Confirmation de votre commande - Platinium IPTV",
       html: `
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
@@ -165,15 +292,18 @@ const handleOrderSubmit = async (event) => {
     });
 
     console.log("✅ Emails Sent Successfully");
+
     toast.add({
       severity: "success",
       summary: "Commande Succès",
       detail: "Votre Commande a été envoyée avec succès !",
       life: 3000,
     });
+
     router.push("/thank-you");
   } catch (error) {
     console.error("❌ Erreur d'envoi:", error);
+
     toast.add({
       severity: "error",
       summary: "Erreur",
@@ -181,18 +311,33 @@ const handleOrderSubmit = async (event) => {
       life: 3000,
     });
   } finally {
-    loading.value = false; 
+    loading.value = false;
   }
 };
 
+onMounted(() => {
+  try {
+    const storedItems = localStorage.getItem("cartItems");
+    cartItems.value = storedItems ? JSON.parse(storedItems) : [];
+    totalPrice.value = cartItems.value.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+  } catch (error) {
+    console.error("Erreur lors de la récupération du panier:", error);
+    cartItems.value = [];
+  }
+  checkToken();
+  getAllUsers();
+});
 </script>
 
 
   <template>
-    <div
+  <div
     class="relative mx-auto w-full bg-cover bg-center"
     :style="{ backgroundImage: `url('/assets/bgg.jpg')` }"
-    >
+  >
     <Toast />
     <Navbar />
     <div class="absolute inset-0 bg-black opacity-15 z-0"></div>
@@ -256,7 +401,12 @@ const handleOrderSubmit = async (event) => {
             >
             <div class="flex items-center">
               <span class="mr-2 text-xl">{{ phoneCode }}</span>
-              <InputText id="phone" v-model="form.phone" name="phone" class="w-full" />
+              <InputText
+                id="phone"
+                v-model="form.phone"
+                name="phone"
+                class="w-full"
+              />
             </div>
 
             <label for="message" class="text-md font-semibold"
@@ -276,7 +426,45 @@ const handleOrderSubmit = async (event) => {
                 justifyContent: 'center',
               }"
             >
-              <h1 class="text-2xl font-bold mb-4">Paiement</h1>
+              <!-- ✅ Show warning if token is invalid -->
+              <div
+                v-if="showWarning"
+                class="bg-red-100 text-red-700 p-4 rounded-md mb-4 text-center"
+              >
+                ⚠️ Attention ! Vous risquez de perdre vos récompenses ! Si vous
+                passez une commande sans avoir un compte, vous ne pourrez pas
+                bénéficier des cadeaux gratuits et des récompenses exclusives.
+              </div>
+
+              <label for="coupon" class="text-md font-semibold text-black">
+                Code de Réduction :
+              </label>
+              <div class="flex flex-row items-center">
+                <InputText
+                  id="coupon"
+                  v-model="form.couponCode"
+                  name="coupon"
+                  class="w-full"
+                />
+                <Button
+                  label="Appliquer"
+                  icon="pi pi-check"
+                  class="ml-3"
+                  @click="applyCoupon"
+                />
+              </div>
+
+              <!-- Show error if the coupon is invalid -->
+              <p v-if="couponError" class="text-red-500 mt-2">
+                {{ couponError }}
+              </p>
+
+              <!-- Show applied discount -->
+              <p v-if="discount > 0" class="text-green-500 mt-2">
+                ✅ Coupon appliqué : -{{ discount }}€
+              </p>
+
+              <h1 class="text-2xl font-bold mb-4 mt-8">Paiement</h1>
               <div
                 class="bg-white-200 border-white border-2 p-4 rounded shadow-md"
               >
@@ -327,7 +515,9 @@ const handleOrderSubmit = async (event) => {
                 </svg>
                 Envoi en cours...
               </span>
-              <span v-else>Passer La commande</span>
+              <span class="font-oswald flex flex-row gap-2 items-center" v-else>
+                <i class="pi pi-credit-card"></i> Passer La commande</span
+              >
             </button>
           </form>
         </div>
@@ -367,7 +557,7 @@ const handleOrderSubmit = async (event) => {
           <div class="my-5 h-0.5 w-full bg-gray-600"></div>
           <p class="flex justify-between text-2xl font-bold text-white">
             <span>Total :</span>
-            <span>{{ totalPrice }}€</span>
+            <span>{{ (totalPrice - discount).toFixed(2) }}€</span>
           </p>
         </div>
       </div>

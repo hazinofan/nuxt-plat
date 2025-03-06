@@ -1,21 +1,109 @@
 <script setup>
 import { jwtDecode } from "jwt-decode";
+import { updateUserInfo } from "~/core/services/platUsers.auth.service";
 
+const loading = ref(false);
 const showPreview = ref(false);
-const user = ref([]);
-const showPasswordFields = ref(false);
+const user = ref({});
+const toast = useToast();
+const visible = ref(false);
+
+const countries = ref([
+  { name: "France", code: "+33" },
+  { name: "Belgique", code: "+32" },
+  { name: "Canada", code: "+1" },
+  { name: "États-Unis", code: "+1" },
+  { name: "Maroc", code: "+212" },
+  { name: "Algérie", code: "+213" },
+  { name: "Tunisie", code: "+216" },
+  { name: "Suisse", code: "+41" },
+  { name: "Allemagne", code: "+49" },
+  { name: "Royaume-Uni", code: "+44" },
+  { name: "Espagne", code: "+34" },
+  { name: "Italie", code: "+39" },
+  { name: "Portugal", code: "+351" },
+  { name: "Pays-Bas", code: "+31" },
+  { name: "Suède", code: "+46" },
+  { name: "Norvège", code: "+47" },
+  { name: "Danemark", code: "+45" },
+  { name: "Finlande", code: "+358" },
+  { name: "Grèce", code: "+30" },
+  { name: "Turquie", code: "+90" },
+  { name: "Russie", code: "+7" },
+  { name: "Japon", code: "+81" },
+  { name: "Chine", code: "+86" },
+  { name: "Corée du Sud", code: "+82" },
+  { name: "Inde", code: "+91" },
+  { name: "Brésil", code: "+55" },
+  { name: "Mexique", code: "+52" },
+  { name: "Argentine", code: "+54" },
+  { name: "Australie", code: "+61" },
+  { name: "Nouvelle-Zélande", code: "+64" },
+  { name: "Afrique du Sud", code: "+27" },
+  { name: "Égypte", code: "+20" },
+  { name: "Arabie Saoudite", code: "+966" },
+  { name: "Émirats Arabes Unis", code: "+971" },
+  { name: "Qatar", code: "+974" },
+  { name: "Liban", code: "+961" },
+]);
+
 
 const fetchUser = () => {
   const token = localStorage.getItem("token");
   if (!token) return;
 
   try {
+    // ✅ First, check localStorage for updated user data
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      user.value = JSON.parse(storedUser);
+      console.log("🔹 User loaded from localStorage:", user.value);
+      return;
+    }
+
+    // ✅ If no updated user data, decode the token
     const userData = jwtDecode(token);
-    console.log(userData);
-    user.value = userData;
-    console.log(user.value);
+    user.value = { ...userData };
+    console.log("🔹 User loaded from token:", user.value);
   } catch (error) {
-    console.error("Invalid token", error);
+    console.error("❌ Invalid token", error);
+  }
+};
+
+const updateUser = async () => {
+  try {
+    loading.value = true;
+
+    // Prepare updated user data
+    const updatedData = {
+      full_name: user.value.full_name,
+      email: user.value.email,
+      phone_number: user.value.phone_number,
+      country: user.value.country,
+    };
+
+    const response = await updateUserInfo(user.value.id, updatedData);
+
+    console.log("✅ User updated:", response);
+
+    user.value = { ...user.value, ...response.user };
+    localStorage.setItem("user", JSON.stringify(response.user));
+
+    toast.add({
+      severity: "success",
+      summary: "Success",
+      detail: "Profil mis à jour avec succès !",
+    });
+    visible.value = false;
+
+    if (response.access_token) {
+      localStorage.setItem("token", response.access_token);
+    }
+  } catch (error) {
+    console.error("❌ Erreur lors de la mise à jour", error);
+    alert("Une erreur est survenue lors de la mise à jour du profil.");
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -42,6 +130,7 @@ onMounted(() => {
 <template>
   <NuxtLayout name="user">
     <div class="pl-20">
+      <Toast />
       <div class="flex flex-row justify-between items-center">
         <img src="/assets/logo.png" alt="Platinium Logo" />
         <Chip
@@ -77,12 +166,12 @@ onMounted(() => {
 
               <!-- Buttons -->
               <div class="flex flex-col gap-3">
-                <!-- Change Profile Picture Button -->
+                <!-- Change Profile Picture Button
                 <button
                   class="inline-flex items-center px-6 py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-sm font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all"
                 >
                   Changer La photo de profile
-                </button>
+                </button> -->
 
                 <!-- View Profile Picture Button -->
                 <Button
@@ -159,7 +248,7 @@ onMounted(() => {
                 <InputText
                   id="phone"
                   type="tel"
-                  v-model="user.tel"
+                  v-model="user.phone_number"
                   disabled
                   class="w-full p-2 border rounded-lg"
                 />
@@ -176,14 +265,129 @@ onMounted(() => {
                 />
               </div>
             </div>
+            <Button
+              label="Modifier"
+              icon="pi pi-pencil"
+              class="mt-10"
+              @click="visible = true"
+            />
+            <Dialog
+              v-model:visible="visible"
+              modal
+              maximizable
+              :draggable="false"
+              header="Modifier Vos Informations"
+              :style="{ width: '55rem' }"
+            >
+              <template #header>
+                <div class="inline-flex items-center justify-center gap-2">
+                  <Avatar :image="user.avatar" shape="circle" />
+                  <span class="font-bold whitespace-nowrap">{{
+                    user.username
+                  }}</span>
+                </div>
+              </template>
+
+              <span
+                class="text-surface-500 dark:text-surface-400 block mb-8 font-oswald"
+              >
+                Mettez à jour vos informations personnelles.
+              </span>
+
+              <!-- ✅ Username -->
+              <div class="flex items-center gap-4 mb-4">
+                <label for="username" class="font-semibold w-36 font-roboto"
+                  >Nom d'utilisateur</label
+                >
+                <InputText
+                  id="username"
+                  v-model="user.username"
+                  class="flex-auto"
+                  autocomplete="off"
+                  disabled
+                />
+              </div>
+
+              <!-- ✅ Full Name -->
+              <div class="flex items-center gap-4 mb-4">
+                <label for="fullname" class="font-semibold w-36 font-roboto"
+                  >Nom Complet</label
+                >
+                <InputText
+                  id="fullname"
+                  v-model="user.full_name"
+                  class="flex-auto"
+                  autocomplete="off"
+                />
+              </div>
+
+              <!-- ✅ Email -->
+              <div class="flex items-center gap-4 mb-2">
+                <label for="email" class="font-semibold w-36 font-roboto"
+                  >Email</label
+                >
+                <InputText
+                  id="email"
+                  v-model="user.email"
+                  class="flex-auto"
+                  autocomplete="off"
+                />
+              </div>
+
+              <!-- ✅ Phone Number -->
+              <div class="flex items-center gap-4 mb-2">
+                <label for="phone" class="font-semibold w-36 font-roboto"
+                  >Téléphone</label
+                >
+                <InputText
+                  id="phone"
+                  v-model="user.phone_number"
+                  class="flex-auto"
+                  autocomplete="off"
+                />
+              </div>
+
+              <!-- ✅ Country -->
+              <div class="flex items-center gap-4 mb-2 mt-10">
+                <label for="country" class="font-semibold w-36 font-roboto"
+                  >Pays</label
+                >
+                <Select
+                  v-model="user.country"
+                  :options="countries"
+                  optionLabel="name"
+                  optionValue="name"
+                  filter
+                  showClear
+                  placeholder="Choisissez votre pays"
+                  class="w-full "
+                />
+              </div>
+              <!-- ✅ Footer Actions -->
+              <template #footer>
+                <Button
+                  label="Annuler"
+                  severity="danger"
+                  @click="visible = false"
+                  autofocus
+                />
+                <Button
+                  label="Sauvegarder"
+                  outlined
+                  severity="success"
+                  @click="updateUser"
+                  :loading="loading"
+                />
+              </template>
+            </Dialog>
           </div>
         </div>
 
-        <!-- Right Section (HERE) -->
+        <!-- Right Section (HERE)
         <div class="w-1/2">
           <h2>CHANGER LE MOT DE PASSE ?</h2>
 
-          <!-- Toggle Button -->
+          
           <div class="mt-4">
             <Button
               label="Changer le mot de passe"
@@ -193,10 +397,9 @@ onMounted(() => {
             />
           </div>
 
-          <!-- PrimeVue Transition for Fade Animation -->
+          
           <Transition name="fade">
             <div v-if="showPasswordFields" class="mt-4">
-              <!-- Current Password -->
               <div class="flex flex-col gap-2">
                 <label for="current-password">Mot de passe actuel</label>
                 <Password
@@ -206,7 +409,7 @@ onMounted(() => {
                 />
               </div>
 
-              <!-- New & Confirm Password (Side by Side) -->
+              
               <div class="grid grid-cols-2 gap-4 mt-2">
                 <div class="flex flex-col gap-2">
                   <label for="new-password">Nouveau mot de passe</label>
@@ -229,7 +432,7 @@ onMounted(() => {
                 </div>
               </div>
 
-              <!-- Submit Button -->
+              
               <div class="mt-4">
                 <button
                   class="inline-flex items-center w-full mt-5 justify-center font-roboto px-6 py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-red-800 to-purple-500 text-white text-sm shadow-lg hover:opacity-90 hover:shadow-xl transition-all"
@@ -239,7 +442,7 @@ onMounted(() => {
               </div>
             </div>
           </Transition>
-        </div>
+        </div> -->
       </div>
     </div>
   </NuxtLayout>
@@ -266,10 +469,12 @@ onMounted(() => {
 }
 
 /* ✅ PrimeVue Fade Animation */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s ease-in-out;
 }
-.fade-enter-from, .fade-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
 </style>

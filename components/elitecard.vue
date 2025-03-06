@@ -1,118 +1,120 @@
-<template>
-  <div>
-    <div class="" data-aos="zoom-in" data-aos-delay="400">
-      <div class="relative pt-8">
-        <div class="absolute inset-0 h-1/2"></div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            class="max-w-lg mx-auto rounded-lg shadow-lg overflow-hidden lg:max-w-none lg:flex"
-          >
-            <!-- Left Side: Text Content -->
-            <div class="flex-1 bg-white dark:bg-gray-900 px-6 py-8 lg:p-12">
-              <!-- ✅ Changed <h3> to <h1> for the main title -->
-              <h1
-                class="text-3xl font-extrabold text-gray-900 dark:text-white sm:text-4xl"
-              >
-                Offre exclusive : PLATINIUM PACK - Meilleure expérience IPTV
-              </h1>
-              <p class="mt-6 text-base text-gray-500 dark:text-gray-300">
-                Le pack Platinum inclut toutes les chaînes des packs Premium et
-                Standard, avec une durée de 14 mois plus 1 mois offert, soit un
-                total de 15 mois...
-              </p>
-              <div class="mt-8">
-                <div class="flex items-center">
-                  <!-- ✅ Changed <h4> to <h2> -->
-                  <h2
-                    class="flex-shrink-0 pr-4 bg-white dark:bg-gray-900 text-lg tracking-wider font-semibold uppercase text-rose-600"
-                  >
-                    Ce qui est inclus
-                  </h2>
-                  <div
-                    class="flex-1 border-t-2 border-gray-200 dark:border-gray-600"
-                  ></div>
-                </div>
-                <ul
-                  class="mt-8 space-y-5 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-x-8 lg:gap-y-5"
-                >
-                  <li class="flex items-start lg:col-span-1">
-                    <div class="flex-shrink-0">
-                      <svg
-                        class="h-5 w-5 text-green-400 dark:text-green-500"
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fill-rule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clip-rule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                    <p class="ml-3 text-sm text-gray-700 dark:text-gray-300">
-                      Accès aux fonctionnalités premium
-                    </p>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- Right Side: Pricing & Order Button -->
-            <div
-              class="py-8 px-6 text-center bg-gray-50 dark:bg-gray-900 lg:flex-shrink-0 lg:flex lg:flex-col lg:justify-center lg:p-12"
-            >
-              <p
-                class="text-lg leading-6 font-medium text-gray-900 dark:text-white"
-              >
-                Offre à durée limitée
-              </p>
-              <div class="mt-3">
-                <span
-                  class="font-mono text-xl md:text-lg font-medium text-gray-500 dark:text-gray-500"
-                  >€</span
-                >
-                <span class="h1 line-through text-gray-600 dark:text-gray-500"
-                  >120</span
-                >
-                <span class="text-red-600 text-sm">Promotion Spéciale</span>
-              </div>
-              <div
-                class="mt-4 flex items-center justify-center text-5xl font-extrabold text-gray-900 dark:text-white"
-              >
-                <span>90€</span>
-                <span
-                  class="ml-3 text-xl font-medium text-gray-500 dark:text-gray-500"
-                  >EUR</span
-                >
-              </div>
-              <div class="mt-6">
-                <NuxtLink
-                  to="/produits/abonnement-iptv-platinium-15-mois"
-                  class="btn_elite inline-block py-2 px-4 bg-purple-600 text-white font-semibold rounded pt-3 hover:bg-purple-700 focus:ring-2 focus:ring-purple-500"
-                  aria-label="Commander l'abonnement IPTV Platinium 15 mois"
-                >
-                  Commander
-                </NuxtLink>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-  
-  <script setup>
+<script setup>
 import { onMounted } from "vue";
 import AOS from "aos";
 import "aos/dist/aos.css";
+
+const events = ref([
+  {
+    status: "Commandez",
+    date: "15/10/2020 10:30",
+    icon: "pi pi-shopping-cart",
+    color: "#9C27B0",
+  },
+  {
+    status: "Payez votre Commande",
+    date: "15/10/2020 14:00",
+    icon: "pi pi-cog",
+    color: "#673AB7",
+  },
+  {
+    status: "Commande taraité",
+    date: "15/10/2020 16:15",
+    icon: "pi pi-shopping-cart",
+    color: "#FF9800",
+  },
+  {
+    status: "Bénéficiez de votre Cadeau",
+    date: "16/10/2020 10:00",
+    icon: "pi pi-check",
+    color: "#607D8B",
+  },
+]);
 
 // ✅ AOS Animation Init
 onMounted(() => {
   AOS.init();
 });
 </script>
+<template>
+  <div class="relative grid md:grid-cols-2 gap-8 p-8 mt-36" data-aos="fade-down" data-aos-delay="500">
+    <!-- ✅ Background Text -->
+    <span
+      class="absolute inset-0 md:flex ml-56 hidden items-center text-gray-500 text-[6rem] md:text-[8rem] font-bold uppercase opacity-10 pointer-events-none"
+    >
+      PLATINIUM <br> SERVICE
+    </span>
+
+    <!-- ✅ Left Section: Timeline -->
+    <div class="relative z-10 card p-6 justify-center justify-items-center">
+      <h2 class="text-3xl font-oswald font-bold text-gray-800 mb-4">
+        Votre Parcours PLATINIUM
+      </h2>
+      <Timeline :value="events" align="alternate" class="w-full mt-10 md:w-80">
+        <template #content="slotProps">
+          {{ slotProps.item.status }}
+        </template>
+      </Timeline>
+
+      <NuxtLink to="/login">
+        <button
+              class="px-10 mt-24 py-1 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center"
+              :disabled="loading"
+              aria-label="Passer la commande"
+            > Créer un Compte</button>
+</NuxtLink>
+
+    </div>
+
+    <!-- ✅ Right Section: Call-to-Action -->
+    <div class="relative z-10 flex flex-col items-center text-center text-black p-6">
+      <h1 class="text-2xl font-bold font-oswald">
+        Bénéficiez de Cadeaux en Créant un Compte PLATINIUM
+      </h1>
+      <p class="text-gray-700 mt-4 font-roboto italic">
+        En créant un compte PLATINIUM, vous accédez à un univers d'avantages
+        exclusifs : offres spéciales, accès anticipé aux nouveautés et bien plus
+        encore. Rejoignez notre communauté grandissante et profitez d'une
+        expérience unique adaptée à vos besoins !
+      </p>
+      <img
+        src="/assets/login.webp"
+        alt="Login Platinium Users"
+        class="my-4 rounded-lg"
+      />
+      <div class="flex flex-row items-center gap-3">
+        <AvatarGroup>
+          <Avatar
+            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            shape="circle"
+          />
+          <Avatar
+            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            shape="circle"
+          />
+          <Avatar
+            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            shape="circle"
+          />
+          <Avatar
+            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            shape="circle"
+          />
+          <Avatar
+            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            shape="circle"
+          />
+          <Avatar label="+150" shape="circle" />
+        </AvatarGroup>
+        <p class="text-lg opacity-90 font-roboto text-gray-800">
+          Rejoignez la communauté PLATINIUM
+        </p>
+      </div>
+    </div>
+  </div>
+</template>
+
+  
+
   
   <style scoped>
 /* ✅ Style for Elite Card */

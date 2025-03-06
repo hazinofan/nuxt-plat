@@ -61,10 +61,10 @@
     <!-- Components -->
     <Caroussel :speed="20" />
     <Integration />
+    <Elitecard />
     <Herosection />
     <Movies :speed="25" />
     <pricing-cards />
-    <Elitecard />
     <Steps />
     <Faq />
     <Footer />
@@ -75,7 +75,6 @@
 <script setup>
 import { NuxtLink } from '#components';
 import { useHead } from '#imports'; 
-import Anouncement from "~/components/anouncement.vue";
 import Caroussel from "~/components/Caroussel.vue";
 import Elitecard from "~/components/elitecard.vue";
 import Faq from "~/components/faq.vue";
