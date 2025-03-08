@@ -104,9 +104,6 @@ useHead({
       crossorigin: "anonymous",
     },
 
-    // Preconnect WebSocket (if used)
-    { rel: "preconnect", href: "wss://platinium-iptv.com" },
-
     // DNS Prefetch for Fallback
     { rel: "dns-prefetch", href: "https://your-api.com" },
     { rel: "dns-prefetch", href: "https://cdn.example.com" },
@@ -119,88 +116,95 @@ onMounted(fetchBlogs);
 </script>
 
 <template>
-  <section class="bg-white dark:bg-gray-900">
-    <Navbar />
-    <!-- Title Section -->
-    <div class="text-center py-10">
-      <h1
-        class="text-4xl font-bold text-black dark:text-white mb-4 font-oswald"
-      >
-        PLATINIUM BLOGS
-      </h1>
-      <p class="text-lg text-gray-600 dark:text-gray-400">
-        Explore, discover, and find inspiration through these exciting journeys.
-      </p>
-    </div>
+  <NuxtLayout name="support">
+    <section class="bg-white dark:bg-gray-900">
+      <Navbar />
+      <!-- Title Section -->
+      <div class="text-center py-10">
+        <h1
+          class="text-4xl font-bold text-black dark:text-white mb-4 font-oswald"
+        >
+          PLATINIUM BLOGS
+        </h1>
+        <p class="text-lg text-gray-600 dark:text-gray-400">
+          Explore, discover, and find inspiration through these exciting
+          journeys.
+        </p>
+      </div>
 
-    <!-- Loading and Error Handling -->
-    <div
-      v-if="loading"
-      class="text-center text-lg font-semibold text-gray-600 dark:text-gray-400"
-    >
-      <LoadingSpinner />
-    </div>
-    <div v-else-if="error" class="text-center text-red-500 font-medium">
-      {{ error }}
-    </div>
-
-    <!-- Content Section -->
-    <div
-      v-else
-      class="px-8 py-10 mx-auto lg:max-w-screen-xl sm:max-w-xl md:max-w-full sm:px-12 md:px-16 lg:py-20 sm:py-16"
-    >
+      <!-- Loading and Error Handling -->
       <div
-        class="grid gap-x-8 gap-y-12 sm:gap-y-16 md:grid-cols-2 lg:grid-cols-3"
+        v-if="loading"
+        class="text-center text-lg font-semibold text-gray-600 dark:text-gray-400"
       >
-        <!-- Loop through blogs -->
-        <div v-for="blog in blogs" :key="blog.slug" class="relative">
-          <router-link
-            :to="`/blogs/${blog.slug}`"
-            class="block overflow-hidden group rounded-xl shadow-lg"
-          >
-            <nuxt-img
-              :src="blog.coverImage || 'https://via.placeholder.com/1080'"
-              :alt="blog.title"
-              preload
-              format="webp"
-              quality="80"
-              width="800"
-              height="450"
-              class="object-cover w-full h-56 transition-all duration-300 ease-out sm:h-64 group-hover:scale-110"
-            />
-          </router-link>
-          <div class="relative mt-5">
-            <div class="flex flex-row gap-5 items-center mb-5 justify-between">
-              <span class="text-gray-500"> PLATINIUM IPTV </span>
-              <p class="uppercase text-xs font-semibold mb-2.5 text-purple-800">
-                {{ new Date(blog.createdAt).toLocaleDateString() }}
-              </p>
-            </div>
+        <LoadingSpinner />
+      </div>
+      <div v-else-if="error" class="text-center text-red-500 font-medium">
+        {{ error }}
+      </div>
+
+      <!-- Content Section -->
+      <div
+        v-else
+        class="px-8 py-10 mx-auto lg:max-w-screen-xl sm:max-w-xl md:max-w-full sm:px-12 md:px-16 lg:py-20 sm:py-16"
+      >
+        <div
+          class="grid gap-x-8 gap-y-12 sm:gap-y-16 md:grid-cols-2 lg:grid-cols-3"
+        >
+          <!-- Loop through blogs -->
+          <div v-for="blog in blogs" :key="blog.slug" class="relative">
             <router-link
               :to="`/blogs/${blog.slug}`"
-              class="block mb-3 hover:underline"
+              class="block overflow-hidden group rounded-xl shadow-lg"
             >
-              <h2
-                class="text-2xl font-bold leading-5 text-black dark:text-white transition-colors duration-200 hover:text-purple-700 dark:hover:text-purple-400"
+              <nuxt-img
+                :src="blog.coverImage || 'https://via.placeholder.com/1080'"
+                :alt="blog.title"
+                preload
+                format="webp"
+                quality="80"
+                width="800"
+                height="450"
+                class="object-cover w-full h-56 transition-all duration-300 ease-out sm:h-64 group-hover:scale-110"
+              />
+            </router-link>
+            <div class="relative mt-5">
+              <div
+                class="flex flex-row gap-5 items-center mb-5 justify-between"
               >
-                {{ trimTitle(blog.title) }}
-              </h2>
-            </router-link>
-            <p
-              class="mb-4 text-gray-700 dark:text-gray-300"
-              v-html="blog.body"
-            ></p>
-            <router-link
-              :to="`/blogs/${blog.slug}`"
-              class="font-medium hover:underline text-purple-600 dark:text-purple-400 gap-2"
-            >
-              Lire plus sur "{{ trimTitleSlug(blog.title) }}"
-              <i class="pi pi-arrow-right"></i>
-            </router-link>
+                <span class="text-gray-500"> PLATINIUM IPTV </span>
+                <p
+                  class="uppercase text-xs font-semibold mb-2.5 text-purple-800"
+                >
+                  {{ new Date(blog.createdAt).toLocaleDateString() }}
+                </p>
+              </div>
+              <router-link
+                :to="`/blogs/${blog.slug}`"
+                class="block mb-3 hover:underline"
+              >
+                <h2
+                  class="text-2xl font-bold leading-5 text-black dark:text-white transition-colors duration-200 hover:text-purple-700 dark:hover:text-purple-400"
+                >
+                  {{ trimTitle(blog.title) }}
+                </h2>
+              </router-link>
+              <p
+                class="mb-4 text-gray-700 dark:text-gray-300"
+                v-html="blog.body"
+              ></p>
+              <router-link
+                :to="`/blogs/${blog.slug}`"
+                class="font-medium hover:underline text-purple-600 dark:text-purple-400 gap-2"
+              >
+                Lire plus sur "{{ trimTitleSlug(blog.title) }}"
+                <i class="pi pi-arrow-right"></i>
+              </router-link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <Footer />
-  </section>
+      <Footer />
+    </section>
+  </NuxtLayout>
 </template>

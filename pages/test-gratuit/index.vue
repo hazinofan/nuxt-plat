@@ -7,6 +7,7 @@ import RadioButton from "primevue/radiobutton";
 import axios from "axios";
 import { useToast } from "primevue/usetoast";
 import environement from "~/core/environement";
+import AOS from "aos";
 
 // Form Data
 const form = ref({
@@ -154,230 +155,294 @@ const submitForm = async () => {
     loading.value = false;
   }
 };
+
+useHead({
+  title: "Test Gratuit IPTV - Essayez Notre Service IPTV Premium",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Profitez d'un test gratuit IPTV pour découvrir notre service premium. Accédez à plus de 22 500 chaînes TV, 50 000 films et séries VOD en qualité 4K, FHD et HD, sans coupure ni buffering.",
+    },
+    {
+      name: "keywords",
+      content:
+        "Test IPTV gratuit, IPTV premium gratuit, abonnement IPTV essai, IPTV sans coupure, IPTV France, IPTV 4K, IPTV HD, meilleur IPTV 2024, IPTV fiable, IPTV stable, IPTV Android, IPTV Smart TV, IPTV box, IPTV PC",
+    },
+    { name: "author", content: "Platinium IPTV" },
+    { name: "robots", content: "index, follow" },
+
+    // Open Graph / Facebook
+    {
+      property: "og:title",
+      content: "Test Gratuit IPTV - Essayez Notre Service IPTV Premium",
+    },
+    {
+      property: "og:description",
+      content:
+        "Essayez gratuitement notre service IPTV premium avec plus de 22 500 chaînes et 50 000 films et séries VOD. Test en qualité 4K et FHD, sans interruption ni buffering.",
+    },
+    {
+      property: "og:image",
+      content: "https://platinium-iptv.com/images/test-iptv-banner.jpg",
+    },
+    {
+      property: "og:url",
+      content: "https://platinium-iptv.com/test-gratuit",
+    },
+    { property: "og:type", content: "website" },
+
+    // Twitter Card
+    { name: "twitter:card", content: "summary_large_image" },
+    {
+      name: "twitter:title",
+      content: "Test Gratuit IPTV - Essayez Notre Service IPTV Premium",
+    },
+    {
+      name: "twitter:description",
+      content:
+        "Testez gratuitement notre IPTV premium avec 22 500 chaînes TV et 50 000 VOD en 4K, FHD et HD. Service stable et sans coupure.",
+    },
+    {
+      name: "twitter:image",
+      content: "https://platinium-iptv.com/images/test-iptv-banner.jpg",
+    },
+  ],
+  link: [{ rel: "canonical", href: "https://platinium-iptv.com/test-gratuit" }],
+});
+
+onMounted(() => {
+  AOS.init();
+});
 </script>
 
 <template>
-  <div>
+  <NuxtLayout name="support">
     <Navbar />
-    <h1 class="text-3xl text-center pt-10 font-semibold mb-10 px-4 font-oswald">
-      Formulaire à remplir pour bénéficier de l'essai IPTV gratuit de 2 heures :
-    </h1>
-
-    <div
-      class="min-h-screen flex items-center justify-center bg-gradient-to-br px-4"
-    >
-      <div
-        class="flex flex-col md:flex-row w-full max-w-5xl bg-white shadow-lg rounded-xl overflow-hidden mb-24"
+    <div data-aos="fade-down" data-aos-delay="400">
+      <h1
+        class="text-3xl text-center pt-10 font-semibold mb-10 px-4 font-oswald"
       >
-        <!-- Left Panel -->
+        Formulaire à remplir pour bénéficier de l'essai IPTV gratuit de 2 heures
+        :
+      </h1>
+
+      <div
+        class="min-h-screen flex items-center justify-center bg-gradient-to-br px-4"
+      >
         <div
-          class="w-full md:w-1/2 bg-gradient-to-br from-gray-900 to-black text-white p-10 flex flex-col justify-center"
+          class="flex flex-col md:flex-row w-full max-w-5xl bg-white shadow-lg rounded-xl overflow-hidden mb-24"
         >
-          <h1 class="text-2xl font-semibold text-purple-400 text-center">
-            Formulaire à remplir pour bénéficier de l'essai IPTV gratuit de 2
-            heures :
-          </h1>
+          <!-- Left Panel -->
+          <div
+            class="w-full md:w-1/2 bg-gradient-to-br from-gray-900 to-black text-white p-10 flex flex-col justify-center"
+          >
+            <h1 class="text-2xl font-semibold text-purple-400 text-center">
+              Formulaire à remplir pour bénéficier de l'essai IPTV gratuit de 2
+              heures :
+            </h1>
 
-          <ul class="mt-5 space-y-3 text-gray-300 text-sm md:text-base">
-            <li>
-              <strong class="text-white text-lg"
-                >Procédure d'Activation :</strong
-              >
-            </li>
-            <li>
-              1️ - Remplissez le formulaire de test de l'abonnement IPTV
-              gratuit.
-            </li>
-            <li>2️ - Cliquez sur envoyer.</li>
-            <li>
-              3️ - Les informations d'activation nécessaires (identifiants et
-              lien m3u) vous seront envoyées dès qu'elles seront générées.
-              (Vérifiez votre email après l'envoi).
-            </li>
-          </ul>
-
-          <div class="mt-6">
-            <h2 class="text-xl font-semibold text-red-500">
-              Informations Utiles :
-            </h2>
-            <p class="text-gray-300 mt-2 text-sm md:text-lg">
-              <strong class="text-white">L'adresse MAC :</strong> une série
-              unique de chiffres et de lettres (Exemple : 1b:10:c8:d2:84:e4) qui
-              identifie votre appareil Smart IPTV TV.
-            </p>
-          </div>
-
-          <div class="mt-6">
-            <h2 class="text-xl font-semibold text-red-500">Remarque :</h2>
-            <ul class="mt-2 text-gray-300 space-y-2 text-sm md:text-base">
+            <ul class="mt-5 space-y-3 text-gray-300 text-sm md:text-base">
               <li>
-                ⚠️ Les comptes de démonstration seront suspendus pendant les
-                grands événements sportifs.
+                <strong class="text-white text-lg"
+                  >Procédure d'Activation :</strong
+                >
               </li>
               <li>
-                📩 Toute demande envoyée pendant la suspension des tests sera
-                retardée.
+                1️ - Remplissez le formulaire de test de l'abonnement IPTV
+                gratuit.
               </li>
+              <li>2️ - Cliquez sur envoyer.</li>
               <li>
-                ❌ Les formulaires mal remplis ou avec des informations
-                manquantes ne seront pas traités.
+                3️ - Les informations d'activation nécessaires (identifiants et
+                lien m3u) vous seront envoyées dès qu'elles seront générées.
+                (Vérifiez votre email après l'envoi).
               </li>
             </ul>
+
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold text-red-500">
+                Informations Utiles :
+              </h2>
+              <p class="text-gray-300 mt-2 text-sm md:text-lg">
+                <strong class="text-white">L'adresse MAC :</strong> une série
+                unique de chiffres et de lettres (Exemple : 1b:10:c8:d2:84:e4)
+                qui identifie votre appareil Smart IPTV TV.
+              </p>
+            </div>
+
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold text-red-500">Remarque :</h2>
+              <ul class="mt-2 text-gray-300 space-y-2 text-sm md:text-base">
+                <li>
+                  ⚠️ Les comptes de démonstration seront suspendus pendant les
+                  grands événements sportifs.
+                </li>
+                <li>
+                  📩 Toute demande envoyée pendant la suspension des tests sera
+                  retardée.
+                </li>
+                <li>
+                  ❌ Les formulaires mal remplis ou avec des informations
+                  manquantes ne seront pas traités.
+                </li>
+              </ul>
+            </div>
+
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold text-purple-500">
+                Informations de Contact :
+              </h2>
+              <p class="text-gray-300 mt-2 text-sm md:text-base">
+                📞 N'hésitez pas à nous contacter pour toute information
+                complémentaire. Nos équipes sont disponibles 7 jours sur 7, 24
+                heures sur 24.
+              </p>
+            </div>
           </div>
 
-          <div class="mt-6">
-            <h2 class="text-xl font-semibold text-purple-500">
-              Informations de Contact :
+          <!-- Right Panel (Form) -->
+          <div
+            class="w-full md:w-1/2 bg-white p-6 md:p-10 flex flex-col justify-center"
+          >
+            <img
+              src="/assets/logo2.png"
+              alt="Platinium IPTV"
+              class="w-36 md:w-52 mb-6 md:mb-10 mx-auto"
+            />
+            <h2 class="text-2xl font-bold text-center md:text-left">
+              Formulaire du Test :
             </h2>
-            <p class="text-gray-300 mt-2 text-sm md:text-base">
-              📞 N'hésitez pas à nous contacter pour toute information
-              complémentaire. Nos équipes sont disponibles 7 jours sur 7, 24
-              heures sur 24.
-            </p>
-          </div>
-        </div>
 
-        <!-- Right Panel (Form) -->
-        <div
-          class="w-full md:w-1/2 bg-white p-6 md:p-10 flex flex-col justify-center"
-        >
-          <img
-            src="/assets/logo2.png"
-            alt="Platinium IPTV"
-            class="w-36 md:w-52 mb-6 md:mb-10 mx-auto"
-          />
-          <h2 class="text-2xl font-bold text-center md:text-left">
-            Formulaire du Test :
-          </h2>
-
-          <!-- Form -->
-          <form @submit.prevent="submitForm" class="mt-6 space-y-6">
-            <div class="p-float-label">
-              <label for="fullName">Nom Complet: *</label>
-              <InputText
-                id="fullName"
-                v-model="form.fullName"
-                class="w-full p-inputtext border rounded-lg"
-                required
-              />
-            </div>
-
-            <div class="p-float-label">
-              <label for="country">Pays: *</label>
-              <Dropdown
-                id="country"
-                v-model="selectedCountry"
-                :options="countries.map((c) => c.name)"
-                placeholder="Sélectionnez un pays"
-                class="w-full p-dropdown"
-                filter
-                required
-                @change="updatePhoneCode"
-              />
-            </div>
-
-            <div class="p-float-label">
-              <label for="email">Email: *</label>
-              <InputText
-                id="email"
-                v-model="form.email"
-                class="w-full p-inputtext border rounded-lg"
-                required
-              />
-            </div>
-
-            <div class="p-float-label">
-              <label for="phone">Numéro de téléphone: *</label>
-              <div class="flex flex-row gap-5 items-center">
-                <span class="mr-2 text-xl">{{ phoneCode }}</span>
+            <!-- Form -->
+            <form @submit.prevent="submitForm" class="mt-6 space-y-6">
+              <div class="p-float-label">
+                <label for="fullName">Nom Complet: *</label>
                 <InputText
-                  id="phone"
-                  v-model="form.phone"
+                  id="fullName"
+                  v-model="form.fullName"
                   class="w-full p-inputtext border rounded-lg"
                   required
                 />
               </div>
-            </div>
 
-            <div class="p-float-label">
-              <label for="macAddress"
-                >Adresse MAC de votre appareil [MAG]:</label
-              >
-              <InputText
-                id="macAddress"
-                v-model="form.macAddress"
-                class="w-full p-inputtext border rounded-lg"
-              />
-            </div>
+              <div class="p-float-label">
+                <label for="country">Pays: *</label>
+                <Dropdown
+                  id="country"
+                  v-model="selectedCountry"
+                  :options="countries.map((c) => c.name)"
+                  placeholder="Sélectionnez un pays"
+                  class="w-full p-dropdown"
+                  filter
+                  required
+                  @change="updatePhoneCode"
+                />
+              </div>
 
-            <div class="p-float-label">
-              <label for="message">Votre Message: *</label>
-              <Textarea
-                id="message"
-                v-model="form.message"
-                class="w-full p-textarea border rounded-lg"
-                rows="3"
-                required
-              />
-            </div>
+              <div class="p-float-label">
+                <label for="email">Email: *</label>
+                <InputText
+                  id="email"
+                  v-model="form.email"
+                  class="w-full p-inputtext border rounded-lg"
+                  required
+                />
+              </div>
 
-            <!-- Option Adult -->
-            <div class="flex items-center space-x-3">
-              <label class="text-sm md:text-base">OPTION ADULT :</label>
-              <RadioButton
-                v-model="form.optionAdult"
-                inputId="yes"
-                name="optionAdult"
-                value="Oui"
-              />
-              <label for="yes" class="ml-2">Oui</label>
-              <RadioButton
-                v-model="form.optionAdult"
-                inputId="no"
-                name="optionAdult"
-                value="Non"
-              />
-              <label for="no" class="ml-2">Non</label>
-            </div>
+              <div class="p-float-label">
+                <label for="phone">Numéro de téléphone: *</label>
+                <div class="flex flex-row gap-5 items-center">
+                  <span class="mr-2 text-xl">{{ phoneCode }}</span>
+                  <InputText
+                    id="phone"
+                    v-model="form.phone"
+                    class="w-full p-inputtext border rounded-lg"
+                    required
+                  />
+                </div>
+              </div>
 
-            <!-- Submit Button -->
-            <!-- Submit Button -->
-            <button
-              class="px-10 w-full py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-red-500 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center items-center"
-              :disabled="loading"
-              aria-label="Envoyer le formulaire"
-            >
-              <span v-if="loading" class="flex items-center">
-                <svg
-                  class="animate-spin h-5 w-5 mr-2 text-white"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
+              <div class="p-float-label">
+                <label for="macAddress"
+                  >Adresse MAC de votre appareil [MAG]:</label
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 108 8h-4l3 3 3-3h-4a8 8 0 01-8 8z"
-                  ></path>
-                </svg>
-                Envoi en cours...
-              </span>
-              <span v-else>Ajouter un Produit</span>
-            </button>
-          </form>
+                <InputText
+                  id="macAddress"
+                  v-model="form.macAddress"
+                  class="w-full p-inputtext border rounded-lg"
+                />
+              </div>
+
+              <div class="p-float-label">
+                <label for="message">Votre Message: *</label>
+                <Textarea
+                  id="message"
+                  v-model="form.message"
+                  class="w-full p-textarea border rounded-lg"
+                  rows="3"
+                  required
+                />
+              </div>
+
+              <!-- Option Adult -->
+              <div class="flex items-center space-x-3">
+                <label class="text-sm md:text-base">OPTION ADULT :</label>
+                <RadioButton
+                  v-model="form.optionAdult"
+                  inputId="yes"
+                  name="optionAdult"
+                  value="Oui"
+                />
+                <label for="yes" class="ml-2">Oui</label>
+                <RadioButton
+                  v-model="form.optionAdult"
+                  inputId="no"
+                  name="optionAdult"
+                  value="Non"
+                />
+                <label for="no" class="ml-2">Non</label>
+              </div>
+
+              <!-- Submit Button -->
+              <!-- Submit Button -->
+              <button
+                class="px-10 w-full py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-red-500 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center items-center"
+                :disabled="loading"
+                aria-label="Envoyer le formulaire"
+              >
+                <span v-if="loading" class="flex items-center">
+                  <svg
+                    class="animate-spin h-5 w-5 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 108 8h-4l3 3 3-3h-4a8 8 0 01-8 8z"
+                    ></path>
+                  </svg>
+                  Envoi en cours...
+                </span>
+                <span v-else>Ajouter un Produit</span>
+              </button>
+            </form>
+          </div>
         </div>
       </div>
+      <Footer />
     </div>
-    <Footer />
-  </div>
+  </NuxtLayout>
 </template>
 
 

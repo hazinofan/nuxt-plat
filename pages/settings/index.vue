@@ -7,6 +7,12 @@ const showPreview = ref(false);
 const user = ref({});
 const toast = useToast();
 const visible = ref(false);
+const authStore = useAuthStore();
+const router = useRouter();
+
+definePageMeta({
+  middleware: "auth",
+});
 
 const countries = ref([
   { name: "France", code: "+33" },
@@ -47,10 +53,12 @@ const countries = ref([
   { name: "Liban", code: "+961" },
 ]);
 
-
 const fetchUser = () => {
   const token = localStorage.getItem("token");
-  if (!token) return;
+  if (!token) {
+    authStore.isAuthenticated = false; // ✅ Mark user as unauthenticated
+    return;
+  }
 
   try {
     // ✅ First, check localStorage for updated user data
@@ -67,6 +75,7 @@ const fetchUser = () => {
     console.log("🔹 User loaded from token:", user.value);
   } catch (error) {
     console.error("❌ Invalid token", error);
+    authStore.isAuthenticated = false; // ✅ Token is invalid, mark as not authenticated
   }
 };
 
@@ -129,7 +138,33 @@ onMounted(() => {
 
 <template>
   <NuxtLayout name="user">
-    <div class="p-4 sm:p-6 lg:p-8">
+    <!-- 🚨 Show Custom Unauthorized Message -->
+    <div
+      v-if="!authStore.isAuthenticated"
+      data-aos="fade-down"
+      data-aos-delay="400"
+      class="flex items-center justify-center min-h-screen px-4"
+    >
+      <div
+        class="bg-white shadow-lg rounded-lg p-6 text-center max-w-lg w-full sm:w-3/4 lg:w-1/2 xl:w-1/3"
+      >
+        <h2
+          class="text-xl sm:text-2xl flex flex-row gap-2 items-center justify-center font-semibold text-red-500"
+        >
+          <i class="pi pi-ban text-3xl sm:text-4xl"></i> Accès Refusé
+        </h2>
+        <p class="text-gray-700 mt-2 text-sm sm:text-base">
+          Vous devez être connecté pour accéder à cette page.
+        </p>
+        <button
+          class="mt-4 w-full sm:w-auto px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition"
+          @click="router.push('/login')"
+        >
+          Aller à la page de connexion
+        </button>
+      </div>
+    </div>
+    <div class="p-4 sm:p-6 lg:p-8" v-else>
       <Toast />
 
       <div class="flex flex-col sm:flex-row justify-between items-center">
@@ -141,12 +176,15 @@ onMounted(() => {
         />
       </div>
 
-      <h1 class="flex items-center text-lg sm:text-2xl md:text-4xl font-roboto mt-6 sm:mt-16">
+      <h1
+        class="flex items-center text-lg sm:text-2xl md:text-4xl font-roboto mt-6 sm:mt-16"
+      >
         <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
         Profile Actif
       </h1>
       <p class="text-gray-700 text-sm sm:text-base font-roboto mt-3">
-        Vous pouvez placer des commandes, écrire des commentaires et utiliser vos cadeaux
+        Vous pouvez placer des commandes, écrire des commentaires et utiliser
+        vos cadeaux
       </p>
 
       <div class="flex flex-col sm:flex-row gap-6 mt-10">
@@ -208,27 +246,47 @@ onMounted(() => {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="flex flex-col gap-2">
                 <label class="font-medium">Username</label>
-                <InputText v-model="user.username" disabled class="w-full p-2 border rounded-lg" />
+                <InputText
+                  v-model="user.username"
+                  disabled
+                  class="w-full p-2 border rounded-lg"
+                />
               </div>
 
               <div class="flex flex-col gap-2">
                 <label class="font-medium">Nom Complet</label>
-                <InputText v-model="user.full_name" disabled class="w-full p-2 border rounded-lg" />
+                <InputText
+                  v-model="user.full_name"
+                  disabled
+                  class="w-full p-2 border rounded-lg"
+                />
               </div>
 
               <div class="flex flex-col gap-2">
                 <label class="font-medium">Email</label>
-                <InputText v-model="user.email" disabled class="w-full p-2 border rounded-lg" />
+                <InputText
+                  v-model="user.email"
+                  disabled
+                  class="w-full p-2 border rounded-lg"
+                />
               </div>
 
               <div class="flex flex-col gap-2">
                 <label class="font-medium">Phone Number</label>
-                <InputText v-model="user.phone_number" disabled class="w-full p-2 border rounded-lg" />
+                <InputText
+                  v-model="user.phone_number"
+                  disabled
+                  class="w-full p-2 border rounded-lg"
+                />
               </div>
 
               <div class="flex flex-col gap-2">
                 <label class="font-medium">Country</label>
-                <InputText v-model="user.country" disabled class="w-full p-2 border rounded-lg" />
+                <InputText
+                  v-model="user.country"
+                  disabled
+                  class="w-full p-2 border rounded-lg"
+                />
               </div>
             </div>
 
@@ -262,7 +320,10 @@ onMounted(() => {
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col sm:flex-row items-center gap-4">
                   <label class="font-semibold w-36">Nom Complet</label>
-                  <InputText v-model="user.full_name" class="w-full sm:flex-auto" />
+                  <InputText
+                    v-model="user.full_name"
+                    class="w-full sm:flex-auto"
+                  />
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -272,7 +333,10 @@ onMounted(() => {
 
                 <div class="flex flex-col sm:flex-row items-center gap-4">
                   <label class="font-semibold w-36">Téléphone</label>
-                  <InputText v-model="user.phone_number" class="w-full sm:flex-auto" />
+                  <InputText
+                    v-model="user.phone_number"
+                    class="w-full sm:flex-auto"
+                  />
                 </div>
 
                 <div class="flex flex-col sm:flex-row items-center gap-4">
@@ -291,8 +355,19 @@ onMounted(() => {
               </div>
 
               <template #footer>
-                <Button label="Annuler" severity="danger" @click="visible = false" autofocus />
-                <Button label="Sauvegarder" outlined severity="success" @click="updateUser" :loading="loading" />
+                <Button
+                  label="Annuler"
+                  severity="danger"
+                  @click="visible = false"
+                  autofocus
+                />
+                <Button
+                  label="Sauvegarder"
+                  outlined
+                  severity="success"
+                  @click="updateUser"
+                  :loading="loading"
+                />
               </template>
             </Dialog>
           </div>

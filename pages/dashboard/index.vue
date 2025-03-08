@@ -4,6 +4,7 @@ import { ref, onMounted } from "vue";
 import Chart from "primevue/chart";
 import Fieldset from "primevue/fieldset";
 import environement from "~/core/environement";
+import AOS from "aos";
 
 const chartData = ref(null);
 const chartOptions = ref(null);
@@ -11,16 +12,25 @@ const userId = ref(null);
 const coupons = ref([]);
 const orders = ref([]);
 const ENGINE = environement.ENGINE_URL;
+definePageMeta({
+  middleware: "auth",
+});
+
+const authStore = useAuthStore();
 
 const fetchUser = () => {
   const token = localStorage.getItem("token");
-  if (!token) return;
+  if (!token) {
+    authStore.isAuthenticated = false;
+    return;
+  }
 
   try {
     const userData = jwtDecode(token);
     userId.value = userData.id;
   } catch (error) {
     console.error("Invalid token", error);
+    authStore.isAuthenticated = false;
   }
 };
 
@@ -49,17 +59,17 @@ const fetchData = async () => {
   }
 };
 
-// ✅ Process Orders to Count Orders per Month
 const processChartData = () => {
   const documentStyle = getComputedStyle(document.documentElement);
 
   // Initialize an array for 12 months (all set to 0)
   const ordersPerMonth = Array(12).fill(0);
 
-  orders.value.forEach(order => {
-    if (order.created_at) { // ✅ Fix: Use `created_at` instead of `date`
+  orders.value.forEach((order) => {
+    if (order.created_at) {
+      // ✅ Fix: Use `created_at` instead of `date`
       const parsedDate = new Date(order.created_at); // Convert to Date Object
-      
+
       if (!isNaN(parsedDate.getTime())) {
         const monthIndex = parsedDate.getMonth(); // Get month (0 = Jan, 11 = Dec)
         ordersPerMonth[monthIndex]++;
@@ -75,16 +85,28 @@ const processChartData = () => {
 
   chartData.value = {
     labels: [
-      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
     ],
     datasets: [
       {
         label: "Nombre de commandes par mois",
         data: ordersPerMonth,
         fill: false,
-        borderColor: documentStyle.getPropertyValue("--p-cyan-500") || "#06b6d4",
-        backgroundColor: documentStyle.getPropertyValue("--p-cyan-300") || "#22d3ee",
+        borderColor:
+          documentStyle.getPropertyValue("--p-cyan-500") || "#06b6d4",
+        backgroundColor:
+          documentStyle.getPropertyValue("--p-cyan-300") || "#22d3ee",
         tension: 0.4,
       },
     ],
@@ -94,8 +116,10 @@ const processChartData = () => {
 const setChartOptions = () => {
   const documentStyle = getComputedStyle(document.documentElement);
   const textColor = documentStyle.getPropertyValue("--p-text-color") || "#333";
-  const textColorSecondary = documentStyle.getPropertyValue("--p-text-muted-color") || "#6b7280";
-  const surfaceBorder = documentStyle.getPropertyValue("--p-content-border-color") || "#e5e7eb";
+  const textColorSecondary =
+    documentStyle.getPropertyValue("--p-text-muted-color") || "#6b7280";
+  const surfaceBorder =
+    documentStyle.getPropertyValue("--p-content-border-color") || "#e5e7eb";
 
   return {
     responsive: true,
@@ -129,6 +153,7 @@ const setChartOptions = () => {
 };
 
 onMounted(async () => {
+  AOS.init();
   await fetchUser();
   await fetchData();
   chartOptions.value = setChartOptions();
@@ -138,8 +163,39 @@ onMounted(async () => {
 
 <template>
   <NuxtLayout name="user">
-    <div class="p-4 sm:p-6 lg:p-8 space-y-4">
-      <h1 class="text-3xl sm:text-4xl font-oswald font-semibold">Tableau de Bord :</h1>
+    <!-- 🚨 Show Custom Unauthorized Message -->
+    <div
+      v-if="!authStore.isAuthenticated"
+      class="flex items-center justify-center min-h-screen px-4"
+    >
+      <div
+        class="bg-white shadow-lg rounded-lg p-6 text-center max-w-lg w-full sm:w-3/4 lg:w-1/2 xl:w-1/3"
+      >
+        <h2
+          class="text-xl sm:text-2xl flex flex-row gap-2 items-center justify-center font-semibold text-red-500"
+        >
+          <i class="pi pi-ban text-3xl sm:text-4xl"></i> Accès Refusé
+        </h2>
+        <p class="text-gray-700 mt-2 text-sm sm:text-base">
+          Vous devez être connecté pour accéder à cette page.
+        </p>
+        <button
+          class="mt-4 w-full sm:w-auto px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition"
+          @click="router.push('/login')"
+        >
+          Aller à la page de connexion
+        </button>
+      </div>
+    </div>
+    <div
+      class="p-4 sm:p-6 lg:p-8 space-y-4"
+      data-aos="fade-down"
+      data-aos-delay="400"
+      v-else
+    >
+      <h1 class="text-3xl sm:text-4xl font-oswald font-semibold">
+        Tableau de Bord :
+      </h1>
 
       <!-- Counter Section -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
@@ -187,14 +243,16 @@ onMounted(async () => {
 
       <Fieldset legend="Nouveauté" class="mb-8 sm:mb-16">
         <p class="m-0 text-black font-roboto text-sm sm:text-base">
-          Nous sommes ravis d'annoncer l'ajout de <strong>cadeaux gratuits</strong>
+          Nous sommes ravis d'annoncer l'ajout de
+          <strong>cadeaux gratuits</strong>
           pour chaque abonnement acheté sur notre site web ! Profitez désormais
-          d'offres exclusives et recevez des cadeaux surprises à chaque souscription.
+          d'offres exclusives et recevez des cadeaux surprises à chaque
+          souscription.
           <br /><br />
-          De plus, pour la première fois, nous avons mis en place 
-          <strong>les cadeaux de parrainage (Referral Gifts)</strong>.
-          Référez vos amis et obtenez des récompenses spéciales pour chaque nouvel abonnement effectué via votre lien de parrainage.
-          <br /><br />
+          De plus, pour la première fois, nous avons mis en place
+          <strong>les cadeaux de parrainage (Referral Gifts)</strong>. Référez
+          vos amis et obtenez des récompenses spéciales pour chaque nouvel
+          abonnement effectué via votre lien de parrainage. <br /><br />
           🎉 Ne manquez pas ces nouvelles opportunités et commencez à accumuler
           vos cadeaux dès aujourd'hui !
         </p>

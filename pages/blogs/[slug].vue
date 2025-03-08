@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
-import { Divider } from "primevue";
+import { useHead } from "#imports";
 import { getBlogBySlug } from "~/core/services/blogs.services";
 import Navbar from "~/components/navbar.vue";
+import AOS from "aos";
 
 const route = useRoute();
 const slug = route.params.slug;
@@ -25,95 +26,55 @@ const fetchBlog = async () => {
   }
 };
 
-import { useHead } from "nuxt/app";
-import { computed, watchEffect } from "vue";
+// ✅ Computed Meta Tags (Ensures `useHead` Waits for Data)
+const pageTitle = computed(() => blog.value?.title || "Blog - Platinium IPTV");
+const pageDescription = computed(() => blog.value?.excerpt || "Découvrez les dernières actualités et tendances IPTV sur Platinium IPTV.");
+const pageAuthor = computed(() => blog.value?.author || "Platinium IPTV");
+const pageImage = computed(() => blog.value?.coverImage || "https://platinium-iptv.com/images/default-thumbnail.jpg");
+const pageUrl = computed(() => `https://platinium-iptv.com/blogs/${blog.value?.slug || slug}`);
 
-watchEffect(() => {
-  if (!blog.value) return;
+useHead(() => ({
+  title: pageTitle.value,
+  meta: [
+    { name: "description", content: pageDescription.value },
+    { name: "keywords", content: "IPTV, abonnement IPTV, blog IPTV, tendances IPTV, streaming, chaînes TV en ligne, IPTV premium, VOD" },
+    { name: "author", content: pageAuthor.value },
+    { name: "robots", content: "index, follow" },
 
-  useHead({
-    title: `${blog.value.title} - Platinium IPTV`,
-    meta: [
-      {
-        name: "description",
-        content: blog.value.excerpt || "Découvrez les dernières actualités et tendances IPTV sur Platinium IPTV.",
-      },
-      {
-        name: "keywords",
-        content: "IPTV, abonnement IPTV, blog IPTV, tendances IPTV, streaming, chaînes TV en ligne, IPTV premium, VOD",
-      },
-      { name: "author", content: blog.value.author || "Platinium IPTV" },
-      { name: "robots", content: "index, follow" },
+    // Open Graph / Facebook Meta Tags
+    { property: "og:title", content: pageTitle.value },
+    { property: "og:description", content: pageDescription.value },
+    { property: "og:image", content: pageImage.value },
+    { property: "og:url", content: pageUrl.value },
+    { property: "og:type", content: "article" },
 
-      // Open Graph / Facebook Meta Tags
-      {
-        property: "og:title",
-        content: blog.value.title,
-      },
-      {
-        property: "og:description",
-        content: blog.value.excerpt || "Découvrez les dernières tendances et conseils IPTV.",
-      },
-      {
-        property: "og:image",
-        content: blog.value.coverImage || "https://platinium-iptv.com/images/default-thumbnail.jpg",
-      },
-      {
-        property: "og:url",
-        content: `https://platinium-iptv.com/blogs/${blog.value.slug}`,
-      },
-      { property: "og:type", content: "article" },
+    // Twitter Card Meta Tags
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: pageTitle.value },
+    { name: "twitter:description", content: pageDescription.value },
+    { name: "twitter:image", content: pageImage.value },
+  ],
+  link: [
+    { rel: "canonical", href: pageUrl.value },
+    { rel: "preconnect", href: "https://your-api.com" },
+    { rel: "preconnect", href: "https://cdn.example.com", crossorigin: "anonymous" },
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
+    { rel: "dns-prefetch", href: "https://your-api.com" },
+    { rel: "dns-prefetch", href: "https://cdn.example.com" },
+    { rel: "dns-prefetch", href: "https://fonts.googleapis.com" },
+  ],
+}));
 
-      // Twitter Card Meta Tags
-      { name: "twitter:card", content: "summary_large_image" },
-      {
-        name: "twitter:title",
-        content: blog.value.title,
-      },
-      {
-        name: "twitter:description",
-        content: blog.value.excerpt || "Découvrez les dernières tendances IPTV sur Platinium IPTV.",
-      },
-      {
-        name: "twitter:image",
-        content: blog.value.coverImage || "https://platinium-iptv.com/images/default-thumbnail.jpg",
-      },
-    ],
-    link: [
-      { rel: "canonical", href: `https://platinium-iptv.com/blogs/${blog.value.slug}` },
-
-      // Preconnect to API and CDNs
-      { rel: "preconnect", href: "https://your-api.com" },
-      {
-        rel: "preconnect",
-        href: "https://cdn.example.com",
-        crossorigin: "anonymous",
-      },
-
-      // Preconnect to Google Fonts (if used)
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossorigin: "anonymous",
-      },
-
-      // Preconnect WebSocket (if used)
-      { rel: "preconnect", href: "wss://platinium-iptv.com" },
-
-      // DNS Prefetch for Fallback
-      { rel: "dns-prefetch", href: "https://your-api.com" },
-      { rel: "dns-prefetch", href: "https://cdn.example.com" },
-      { rel: "dns-prefetch", href: "https://fonts.googleapis.com" },
-    ],
-  });
+onMounted(() => {
+  fetchBlog()
+  AOS.init()
 });
-
-
-onMounted(fetchBlog);
 </script>
 
+
 <template>
+    <NuxtLayout name="support">
     <article
     class="max-w-4xl px-6 pb-24 mx-auto space-y-12 dark:bg-gray-100 dark:text-gray-900"
     >
@@ -124,7 +85,7 @@ onMounted(fetchBlog);
     >
       Loading blog...
     </div>
-    <div v-else-if="error" class="text-center text-red-500 font-medium">
+    <div v-else-if="error" class="text-center text-red-500 font-medium" data-aos="fade-down" data-aos-delay="400">
       {{ error }}
     </div>
     <div v-else>
@@ -158,6 +119,7 @@ onMounted(fetchBlog);
       </p>
     </div>
   </article>
+  </NuxtLayout>
 </template>
 
 <style>

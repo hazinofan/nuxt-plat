@@ -13,7 +13,7 @@
               <span class="font-bold text-purple-600 text-2xl"
                 >3 Étapes Faciles pour Commencer avec PLATINIUM IPTV</span
               >
-              <NuxtImg src="/assets/steps.png" format="webp" alt="Étapes d'utilisation"/>
+              <NuxtImg src="/assets/steps.webp" format="webp" alt="Étapes d'utilisation"/>
             </div>
           </div>
 

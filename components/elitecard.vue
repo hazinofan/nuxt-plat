@@ -36,12 +36,17 @@ onMounted(() => {
 });
 </script>
 <template>
-  <div class="relative grid md:grid-cols-2 gap-8 p-8 mt-36" data-aos="fade-down" data-aos-delay="500">
+  <div
+    class="relative grid md:grid-cols-2 gap-8 p-8 mt-36"
+    data-aos="fade-down"
+    data-aos-delay="500"
+  >
     <!-- ✅ Background Text -->
     <span
-      class="absolute inset-0 md:flex ml-56 hidden items-center text-gray-500 text-[6rem] md:text-[8rem] font-bold uppercase opacity-10 pointer-events-none"
+      class="absolute inset-0 md:flex ml-56 hidden items-center text-gray-900 text-[6rem] md:text-[8rem] font-bold uppercase opacity-10 pointer-events-none"
     >
-      PLATINIUM <br> SERVICE
+      PLATINIUM <br />
+      SERVICE
     </span>
 
     <!-- ✅ Left Section: Timeline -->
@@ -57,16 +62,19 @@ onMounted(() => {
 
       <NuxtLink to="/login">
         <button
-              class="px-10 mt-24 py-1 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center"
-              :disabled="loading"
-              aria-label="Passer la commande"
-            > Créer un Compte</button>
-</NuxtLink>
-
+          class="px-10 mt-24 py-1 rounded-tl-3xl font-oswald rounded-br-3xl items-center rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center"
+          :disabled="loading"
+          aria-label="Passer la commande"
+        >
+          Créer un Compte
+        </button>
+      </NuxtLink>
     </div>
 
     <!-- ✅ Right Section: Call-to-Action -->
-    <div class="relative z-10 flex flex-col items-center text-center text-black p-6">
+    <div
+      class="relative z-10 flex flex-col items-center text-center text-black p-6"
+    >
       <h1 class="text-2xl font-bold font-oswald">
         Bénéficiez de Cadeaux en Créant un Compte PLATINIUM
       </h1>
@@ -84,27 +92,33 @@ onMounted(() => {
       <div class="flex flex-row items-center gap-3">
         <AvatarGroup>
           <Avatar
-            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            image="/assets/assistant.webp"
             shape="circle"
+            aria-label="Amy Elsner profile picture"
           />
           <Avatar
-            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            image="/assets/assistant2.webp"
             shape="circle"
+            aria-label="Amy Elsner profile picture"
           />
           <Avatar
-            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            image="/assets/assistant3.webp"
             shape="circle"
+            aria-label="Amy Elsner profile picture"
           />
           <Avatar
-            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            image="/assets/assistant.webp"
             shape="circle"
+            aria-label="Amy Elsner profile picture"
           />
           <Avatar
-            image="https://primefaces.org/cdn/primevue/images/avatar/amyelsner.png"
+            image="/assets/assistant2.webp"
             shape="circle"
+            aria-label="Amy Elsner profile picture"
           />
-          <Avatar label="+150" shape="circle" />
+          <Avatar label="+150" shape="circle" aria-label="More users" />
         </AvatarGroup>
+
         <p class="text-lg opacity-90 font-roboto text-gray-800">
           Rejoignez la communauté PLATINIUM
         </p>
