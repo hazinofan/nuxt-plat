@@ -138,64 +138,70 @@ onMounted(async () => {
 
 <template>
   <NuxtLayout name="user">
-    <div class="p-4 space-y-4">
-      <h1 class="text-4xl font-oswald font-semibold">Tableau de Bord :</h1>
+    <div class="p-4 sm:p-6 lg:p-8 space-y-4">
+      <h1 class="text-3xl sm:text-4xl font-oswald font-semibold">Tableau de Bord :</h1>
 
       <!-- Counter Section -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
         <!-- Commandes Card -->
         <div
-          class="flex items-center justify-between bg-black/75 text-white p-4 rounded-lg shadow-lg"
+          class="flex items-center justify-between bg-black/75 text-white p-4 sm:p-6 rounded-lg shadow-lg"
         >
           <div class="flex items-center">
-            <i class="pi pi-receipt text-3xl mr-3"></i>
-            <h2 class="text-xl text-white font-roboto font-semibold">Nombre Total des Commandes</h2>
+            <i class="pi pi-receipt text-2xl sm:text-3xl mr-3"></i>
+            <h2 class="text-lg sm:text-xl text-white font-roboto font-semibold">
+              Nombre Total des Commandes
+            </h2>
           </div>
-          <h2 class="text-3xl text-white font-roboto font-semibold">{{ orders.length }}</h2>
+          <h2 class="text-2xl sm:text-3xl text-white font-roboto font-semibold">
+            {{ orders.length }}
+          </h2>
         </div>
 
         <!-- Cadeaux Card -->
         <div
-          class="flex items-center justify-between bg-purple-500/75 text-white p-4 rounded-lg shadow-lg"
+          class="flex items-center justify-between bg-purple-500/75 text-white p-4 sm:p-6 rounded-lg shadow-lg"
         >
           <div class="flex items-center">
-            <i class="pi pi-gift text-3xl mr-3"></i>
-            <h2 class="text-xl text-white font-roboto font-semibold">Nombre total des Coupons</h2>
+            <i class="pi pi-gift text-2xl sm:text-3xl mr-3"></i>
+            <h2 class="text-lg sm:text-xl text-white font-roboto font-semibold">
+              Nombre total des Coupons
+            </h2>
           </div>
-          <h2 class="text-3xl text-white font-roboto font-semibold">{{ coupons.length }}</h2>
+          <h2 class="text-2xl sm:text-3xl text-white font-roboto font-semibold">
+            {{ coupons.length }}
+          </h2>
         </div>
       </div>
 
       <!-- Chart Section -->
-      <div class="card p-4 bg-white">
+      <div class="card p-4 sm:p-6 bg-white rounded-lg shadow-lg">
         <Chart
           v-if="chartData"
           type="line"
           :data="chartData"
           :options="chartOptions"
-          class="h-[25rem]"
+          class="h-[18rem] sm:h-[25rem]"
         />
       </div>
 
-      <Fieldset legend="Nouveauté" class="mb-16">
-        <p class="m-0 text-black font-roboto">
-          Nous sommes ravis d'annoncer l'ajout de **cadeaux gratuits** pour
-          chaque abonnement acheté sur notre site web ! Profitez désormais
-          d'offres exclusives et recevez des cadeaux surprises à chaque
-          souscription.
+      <Fieldset legend="Nouveauté" class="mb-8 sm:mb-16">
+        <p class="m-0 text-black font-roboto text-sm sm:text-base">
+          Nous sommes ravis d'annoncer l'ajout de <strong>cadeaux gratuits</strong>
+          pour chaque abonnement acheté sur notre site web ! Profitez désormais
+          d'offres exclusives et recevez des cadeaux surprises à chaque souscription.
           <br /><br />
-          De plus, pour la première fois, nous avons mis en place **les cadeaux
-          de parrainage (Referral Gifts)**. Référez vos amis et obtenez des
-          récompenses spéciales pour chaque nouvel abonnement effectué via votre
-          lien de parrainage.
+          De plus, pour la première fois, nous avons mis en place 
+          <strong>les cadeaux de parrainage (Referral Gifts)</strong>.
+          Référez vos amis et obtenez des récompenses spéciales pour chaque nouvel abonnement effectué via votre lien de parrainage.
           <br /><br />
           🎉 Ne manquez pas ces nouvelles opportunités et commencez à accumuler
           vos cadeaux dès aujourd'hui !
         </p>
       </Fieldset>
 
-      <div class="justify-self-center mt-16">
-        <span class="font-roboto justify-center">
+      <div class="justify-self-center mt-8 sm:mt-16 text-center">
+        <span class="font-roboto text-sm sm:text-base">
           Pour toute question ou assistance, consultez notre
           <NuxtLink
             to="/support"

@@ -129,33 +129,31 @@ onMounted(() => {
 
 <template>
   <NuxtLayout name="user">
-    <div class="pl-20">
+    <div class="p-4 sm:p-6 lg:p-8">
       <Toast />
-      <div class="flex flex-row justify-between items-center">
-        <img src="/assets/logo.png" alt="Platinium Logo" />
+
+      <div class="flex flex-col sm:flex-row justify-between items-center">
+        <img src="/assets/logo.png" alt="Platinium Logo" class="w-28 sm:w-36" />
         <Chip
           :label="user.username"
           image="/assets/avatar.jpg"
-          class="custom-chip mr-16"
+          class="custom-chip mt-4 sm:mt-0"
         />
       </div>
 
-      <h1 class="flex items-center text-4xl font-roboto mt-16">
-        <span
-          class="w-3 h-3 mr-2 bg-green-500 rounded-full text-xl inline-block"
-        ></span>
+      <h1 class="flex items-center text-lg sm:text-2xl md:text-4xl font-roboto mt-6 sm:mt-16">
+        <span class="w-3 h-3 mr-2 bg-green-500 rounded-full"></span>
         Profile Actif
       </h1>
-      <p class="text-gray-700 font-roboto mt-3">
-        Vous pouvez placer des commandes, écrire des commentaires et utiliser
-        vos cadeaux
+      <p class="text-gray-700 text-sm sm:text-base font-roboto mt-3">
+        Vous pouvez placer des commandes, écrire des commentaires et utiliser vos cadeaux
       </p>
-      <div class="flex gap-10 mt-10">
-        <!-- Left Section (Profile & Inputs) -->
-        <div class="w-1/2">
+
+      <div class="flex flex-col sm:flex-row gap-6 mt-10">
+        <!-- ✅ Left Section (Profile & Inputs) -->
+        <div class="w-full sm:w-1/2">
           <div class="flex flex-col">
-            <!-- Profile Section -->
-            <div class="flex flex-row gap-6">
+            <div class="md:flex grid place-items-center flex-row gap-6">
               <!-- Avatar -->
               <Avatar
                 image="/assets/avatar.jpg"
@@ -189,7 +187,7 @@ onMounted(() => {
               header="Photo de Profil"
               :modal="true"
               :closable="true"
-              class="w-96"
+              class="w-full sm:w-[50%] md:w-[25rem]"
             >
               <div class="flex justify-center">
                 <img
@@ -201,244 +199,134 @@ onMounted(() => {
             </Dialog>
           </div>
 
-          <!-- User Information -->
-          <div class="p-6">
-            <h2 class="text-2xl font-semibold mb-4 mt-3 font-oswald">
+          <!-- ✅ User Information -->
+          <div class="p-4 sm:p-6">
+            <h2 class="text-lg sm:text-2xl font-semibold mb-4 mt-3 font-oswald">
               VOS INFORMATIONS
             </h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Username -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="flex flex-col gap-2">
-                <label for="username" class="font-medium">Username</label>
-                <InputText
-                  id="username"
-                  v-model="user.username"
-                  disabled
-                  class="w-full p-2 border rounded-lg"
-                />
+                <label class="font-medium">Username</label>
+                <InputText v-model="user.username" disabled class="w-full p-2 border rounded-lg" />
               </div>
 
-              <!-- Full Name -->
               <div class="flex flex-col gap-2">
-                <label for="fullname" class="font-medium">Nom Complet :</label>
-                <InputText
-                  id="fullname"
-                  v-model="user.full_name"
-                  disabled
-                  class="w-full p-2 border rounded-lg"
-                />
+                <label class="font-medium">Nom Complet</label>
+                <InputText v-model="user.full_name" disabled class="w-full p-2 border rounded-lg" />
               </div>
 
-              <!-- Email -->
               <div class="flex flex-col gap-2">
-                <label for="email" class="font-medium">Email</label>
-                <InputText
-                  id="email"
-                  type="email"
-                  v-model="user.email"
-                  disabled
-                  class="w-full p-2 border rounded-lg"
-                />
+                <label class="font-medium">Email</label>
+                <InputText v-model="user.email" disabled class="w-full p-2 border rounded-lg" />
               </div>
 
-              <!-- Phone Number -->
               <div class="flex flex-col gap-2">
-                <label for="phone" class="font-medium">Phone Number</label>
-                <InputText
-                  id="phone"
-                  type="tel"
-                  v-model="user.phone_number"
-                  disabled
-                  class="w-full p-2 border rounded-lg"
-                />
+                <label class="font-medium">Phone Number</label>
+                <InputText v-model="user.phone_number" disabled class="w-full p-2 border rounded-lg" />
               </div>
 
-              <!-- Country -->
               <div class="flex flex-col gap-2">
-                <label for="country" class="font-medium">Country</label>
-                <InputText
-                  id="country"
-                  v-model="user.country"
-                  disabled
-                  class="w-full p-2 border rounded-lg"
-                />
+                <label class="font-medium">Country</label>
+                <InputText v-model="user.country" disabled class="w-full p-2 border rounded-lg" />
               </div>
             </div>
+
             <Button
               label="Modifier"
               icon="pi pi-pencil"
-              class="mt-10"
+              class="mt-10 w-full sm:w-auto"
               @click="visible = true"
             />
+
+            <!-- ✅ Edit Profile Dialog -->
             <Dialog
               v-model:visible="visible"
               modal
               maximizable
               :draggable="false"
               header="Modifier Vos Informations"
-              :style="{ width: '55rem' }"
+              :style="{ width: '100%', maxWidth: '55rem' }"
             >
               <template #header>
-                <div class="inline-flex items-center justify-center gap-2">
+                <div class="flex items-center gap-2">
                   <Avatar :image="user.avatar" shape="circle" />
-                  <span class="font-bold whitespace-nowrap">{{
-                    user.username
-                  }}</span>
+                  <span class="font-bold">{{ user.username }}</span>
                 </div>
               </template>
 
-              <span
-                class="text-surface-500 dark:text-surface-400 block mb-8 font-oswald"
-              >
+              <span class="text-surface-500 block mb-8 font-oswald">
                 Mettez à jour vos informations personnelles.
               </span>
 
-              <!-- ✅ Username -->
-              <div class="flex items-center gap-4 mb-4">
-                <label for="username" class="font-semibold w-36 font-roboto"
-                  >Nom d'utilisateur</label
-                >
-                <InputText
-                  id="username"
-                  v-model="user.username"
-                  class="flex-auto"
-                  autocomplete="off"
-                  disabled
-                />
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                  <label class="font-semibold w-36">Nom Complet</label>
+                  <InputText v-model="user.full_name" class="w-full sm:flex-auto" />
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                  <label class="font-semibold w-36">Email</label>
+                  <InputText v-model="user.email" class="w-full sm:flex-auto" />
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                  <label class="font-semibold w-36">Téléphone</label>
+                  <InputText v-model="user.phone_number" class="w-full sm:flex-auto" />
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                  <label class="font-semibold w-36">Pays</label>
+                  <Select
+                    v-model="user.country"
+                    :options="countries"
+                    optionLabel="name"
+                    optionValue="name"
+                    filter
+                    showClear
+                    placeholder="Choisissez votre pays"
+                    class="w-full sm:flex-auto"
+                  />
+                </div>
               </div>
 
-              <!-- ✅ Full Name -->
-              <div class="flex items-center gap-4 mb-4">
-                <label for="fullname" class="font-semibold w-36 font-roboto"
-                  >Nom Complet</label
-                >
-                <InputText
-                  id="fullname"
-                  v-model="user.full_name"
-                  class="flex-auto"
-                  autocomplete="off"
-                />
-              </div>
-
-              <!-- ✅ Email -->
-              <div class="flex items-center gap-4 mb-2">
-                <label for="email" class="font-semibold w-36 font-roboto"
-                  >Email</label
-                >
-                <InputText
-                  id="email"
-                  v-model="user.email"
-                  class="flex-auto"
-                  autocomplete="off"
-                />
-              </div>
-
-              <!-- ✅ Phone Number -->
-              <div class="flex items-center gap-4 mb-2">
-                <label for="phone" class="font-semibold w-36 font-roboto"
-                  >Téléphone</label
-                >
-                <InputText
-                  id="phone"
-                  v-model="user.phone_number"
-                  class="flex-auto"
-                  autocomplete="off"
-                />
-              </div>
-
-              <!-- ✅ Country -->
-              <div class="flex items-center gap-4 mb-2 mt-10">
-                <label for="country" class="font-semibold w-36 font-roboto"
-                  >Pays</label
-                >
-                <Select
-                  v-model="user.country"
-                  :options="countries"
-                  optionLabel="name"
-                  optionValue="name"
-                  filter
-                  showClear
-                  placeholder="Choisissez votre pays"
-                  class="w-full "
-                />
-              </div>
-              <!-- ✅ Footer Actions -->
               <template #footer>
-                <Button
-                  label="Annuler"
-                  severity="danger"
-                  @click="visible = false"
-                  autofocus
-                />
-                <Button
-                  label="Sauvegarder"
-                  outlined
-                  severity="success"
-                  @click="updateUser"
-                  :loading="loading"
-                />
+                <Button label="Annuler" severity="danger" @click="visible = false" autofocus />
+                <Button label="Sauvegarder" outlined severity="success" @click="updateUser" :loading="loading" />
               </template>
             </Dialog>
           </div>
         </div>
 
-        <!-- Right Section (HERE)
-        <div class="w-1/2">
-          <h2>CHANGER LE MOT DE PASSE ?</h2>
+        <!-- ✅ Right Section (Change Password)
+        <div class="w-full sm:w-1/2">
+          <h2 class="text-lg sm:text-2xl font-semibold font-oswald">Changer le mot de passe</h2>
 
-          
           <div class="mt-4">
             <Button
               label="Changer le mot de passe"
               icon="pi pi-key"
-              class="p-button-primary"
+              class="p-button-primary w-full sm:w-auto"
               @click="showPasswordFields = !showPasswordFields"
             />
           </div>
 
-          
           <Transition name="fade">
             <div v-if="showPasswordFields" class="mt-4">
               <div class="flex flex-col gap-2">
-                <label for="current-password">Mot de passe actuel</label>
-                <Password
-                  v-model="passwords.current"
-                  :toggleMask="true"
-                  class="w-full"
-                />
+                <label>Mot de passe actuel</label>
+                <Password v-model="passwords.current" :toggleMask="true" class="w-full" />
               </div>
 
-              
-              <div class="grid grid-cols-2 gap-4 mt-2">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                 <div class="flex flex-col gap-2">
-                  <label for="new-password">Nouveau mot de passe</label>
-                  <Password
-                    v-model="passwords.new"
-                    :toggleMask="true"
-                    class="w-full"
-                  />
+                  <label>Nouveau mot de passe</label>
+                  <Password v-model="passwords.new" :toggleMask="true" class="w-full" />
                 </div>
-
                 <div class="flex flex-col gap-2">
-                  <label for="confirm-password"
-                    >Confirmer le nouveau mot de passe</label
-                  >
-                  <Password
-                    v-model="passwords.confirm"
-                    :toggleMask="true"
-                    class="w-full"
-                  />
+                  <label>Confirmer le mot de passe</label>
+                  <Password v-model="passwords.confirm" :toggleMask="true" class="w-full" />
                 </div>
-              </div>
-
-              
-              <div class="mt-4">
-                <button
-                  class="inline-flex items-center w-full mt-5 justify-center font-roboto px-6 py-2 rounded-tl-3xl rounded-br-3xl rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-red-800 to-purple-500 text-white text-sm shadow-lg hover:opacity-90 hover:shadow-xl transition-all"
-                >
-                  Changer La photo de profile
-                </button>
               </div>
             </div>
           </Transition>
@@ -447,6 +335,7 @@ onMounted(() => {
     </div>
   </NuxtLayout>
 </template>
+
   
 
 

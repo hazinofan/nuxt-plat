@@ -1,9 +1,10 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { jwtDecode } from "jwt-decode";
 import Avatar from "primevue/avatar";
 
 const isExpanded = ref(true);
+const isMobile = ref(false);
 const user = ref(null);
 
 const fetchUser = () => {
@@ -17,20 +18,39 @@ const fetchUser = () => {
   }
 };
 
+
+const checkScreenSize = () => {
+  isMobile.value = window.innerWidth < 768;
+  if (isMobile.value) {
+    isExpanded.value = false; 
+  }
+};
+
 onMounted(() => {
+  checkScreenSize(); 
+  window.addEventListener("resize", checkScreenSize); 
   fetchUser();
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", checkScreenSize); 
 });
 </script>
 
 <template>
-  <div class="">
+  <div class="relative">
     <!-- Main Content Area -->
-    <main class="flex-1 p-6" :class="isExpanded ? 'ml-64' : 'ml-20'">
+    <main class="flex-1 md:p-6 transition-all duration-300" :class="isExpanded && isMobile ? 'ml-0' : isExpanded ? 'ml-64' : 'ml-20'">
       <slot />
     </main>
+
     <aside
       class="h-screen border-r bg-purple-300/25 fixed left-0 top-0 transition-all duration-300 ease-in-out"
-      :style="{ width: isExpanded ? '16rem' : '5rem' }"
+      :class="{ 
+        'w-64': isExpanded, 
+        'w-20': !isExpanded, 
+        'z-50 fixed bg-white/95': isExpanded && isMobile
+      }"
     >
       <!-- Sidebar Header -->
       <div class="flex items-center justify-between p-5">
@@ -42,7 +62,7 @@ onMounted(() => {
           <i class="pi pi-bars text-xl"></i>
         </button>
       </div>
-      <div class="self-center justify-items-center">
+      <div class="self-center justify-items-center ml-2">
         <Avatar
           :image="user?.avatar || '/assets/avatar.jpg'"
           class="mr-2"
@@ -50,16 +70,16 @@ onMounted(() => {
           shape="circle"
         />
         <p
-          class="font-roboto text-gray-700 dark:text-gray-200 text-lg font-medium"
+          class="font-roboto text-gray-700 text-lg font-medium"
           :class="isExpanded ? 'w-auto block' : 'w-0 hidden'"
         >
-          {{ user?.username || "Guest" }}
+          {{ user?.username || "Unknown" }}
         </p>
         <p
           class="font-roboto text-gray-700 dark:text-gray-200 text-xs font-medium"
           :class="isExpanded ? 'w-auto block' : 'w-0 hidden'"
         >
-          {{ user?.email || "Guest" }}
+          {{ user?.email || "Unknown" }}
         </p>
       </div>
 

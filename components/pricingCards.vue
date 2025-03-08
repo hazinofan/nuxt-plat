@@ -16,28 +16,28 @@ const fetchCartItems = () => {
 };
 
 const addToCart = (product) => {
-  if (!process.client) return;
+  if (!product) return;
 
-  const storedCart = localStorage.getItem("cartItems");
-  const cart = storedCart ? JSON.parse(storedCart) : [];
+  const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+  const existingItem = cartItems.find((item) => item.id === product.id);
 
-  const existingItem = cart.find((item) => item.id === product.id);
   if (existingItem) {
     existingItem.quantity += 1;
   } else {
-    cart.push({ ...product, quantity: 1 });
+    cartItems.push({ ...product, quantity: 1 });
   }
 
-  localStorage.setItem("cartItems", JSON.stringify(cart));
-  cartItems.value = cart;
+  localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  window.dispatchEvent(new Event("storage"));
 
   toast.add({
     severity: "success",
     summary: "Success",
-    detail: `${product.name} has been added to the cart!`,
-    life: 3000,
+    detail: "Produit Ajouté avec Succès !",
+    life: 6000,
   });
 };
+
 
 onMounted(() => {
   fetchCartItems(); 

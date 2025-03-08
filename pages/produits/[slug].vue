@@ -1,5 +1,5 @@
 <script setup>
-import Breadcrumb from "primevue/breadcrumb"; 
+import Breadcrumb from "primevue/breadcrumb";
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import Navbar from "~/components/navbar.vue";
@@ -10,7 +10,8 @@ const activeTab = ref("details");
 const product = ref(null);
 const loading = ref(true);
 const errorMessage = ref(null);
-const value = ref("0"); 
+const value = ref("0");
+const toast = useToast();
 
 onMounted(async () => {
   try {
@@ -47,6 +48,13 @@ const addToCart = (product) => {
 
   localStorage.setItem("cartItems", JSON.stringify(cartItems));
   window.dispatchEvent(new Event("storage"));
+
+  toast.add({
+    severity: "success",
+    summary: "Success",
+    detail: "Produit Ajouté avec Succès !",
+    life: 6000,
+  });
 };
 </script>
 

@@ -26,20 +26,30 @@ const isUserMenuOpen = ref(false);
 const user = ref(null);
 const cartItems = ref([]);
 
-// ✅ Fetch User from Token (Client-Side Only)
+// ✅ Fetch User from Token (Automatically Logout if Expired)
 const fetchUser = () => {
-  if (process.client) {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+  const token = localStorage.getItem("token");
+  if (!token) return;
 
-    try {
-      user.value = jwtDecode(token);
-      console.log("User Data:", user.value);
-    } catch (error) {
-      console.error("Invalid token", error);
+  try {
+    const decoded = jwtDecode(token);
+    const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+
+    if (decoded.exp && decoded.exp < currentTime) {
+      console.warn("Token expired, logging out...");
+      logout();
+      return;
     }
+
+    user.value = decoded;
+    console.log("User Data:", user.value);
+  } catch (error) {
+    console.error("Invalid token", error);
+    logout();
   }
 };
+
+
 
 // ✅ Computed Navigation Items
 const navItems = computed(() => [
@@ -73,7 +83,7 @@ const logout = () => {
     life: 3000,
   });
 
-  router.push("/"); // ✅ Ensure navbar updates after logout
+  router.push("/login"); 
 };
 
 // ✅ Toggle User Menu
@@ -81,20 +91,17 @@ const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
 };
 
-// ✅ Fetch Cart Items from Local Storage (Only on Client)
+
 const fetchCartItems = () => {
-  if (process.client) {
-    try {
-      const storedCart = localStorage.getItem("cartItems");
-      cartItems.value = storedCart ? JSON.parse(storedCart) : [];
-    } catch (error) {
-      console.error("Error parsing cart data:", error);
-      localStorage.removeItem("cartItems"); 
-      cartItems.value = [];
-    }
+  try {
+    const storedCart = localStorage.getItem("cartItems");
+    cartItems.value = storedCart ? JSON.parse(storedCart) : [];
+  } catch (error) {
+    console.error("Error parsing cart data:", error);
+    localStorage.removeItem("cartItems"); 
+    cartItems.value = [];
   }
 };
-
 
 // ✅ Remove Item from Cart
 const removeFromCart = (id) => {
@@ -255,7 +262,7 @@ onUnmounted(() => {
             <img :src="item.photos" class="w-16 h-16 object-cover rounded-md border"/>
             <div>
               <p class="text-lg font-semibold text-center">{{ item.name }}</p>
-              <div class="flex items-center space-x-4">
+              <div class="flex items-center space-x-4 justify-center">
                 <p class="text-green-600 font-semibold">{{ item.price }}€ x {{ item.quantity }}</p>
                 <button @click="removeFromCart(item.id)" class="p-2 text-red-600 hover:text-red-800">
                   🗑️
@@ -268,9 +275,9 @@ onUnmounted(() => {
             <p class="text-lg font-bold">Total: {{ totalPrice }}€</p>
           </div>
 
-          <div class="flex flex-col gap-3 md:flex-row">
+          <div class="flex flex-col gap-3 md:flex-row justify-center mt-5">
             <Button label="Vider le Panier" class="p-button-outlined p-button-danger" @click="clearCart"/>
-            <Button label="Paiement" class="p-button-success" @click="$router.push('/checkout'); toggleCart();"/>
+            <Button label="checkout" class="p-button-outlined p-button-success" @click="$router.push('/checkout'); toggleCart();"/>
           </div>
         </template>
 

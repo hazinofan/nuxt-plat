@@ -316,9 +316,9 @@ const handleOrderSubmit = async (event) => {
   }
 };
 
-onMounted(() => {
-  checkToken();
-  getAllUsers();
+onMounted(async() => {
+  await checkToken();
+  await getAllUsers();
   try {
     const storedItems = localStorage.getItem("cartItems");
     cartItems.value = storedItems ? JSON.parse(storedItems) : [];

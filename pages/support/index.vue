@@ -6,11 +6,11 @@ import { getUserProfile } from "~/core/services/platUsers.auth.service";
 import environement from "~/core/environement";
 
 const showModal = ref(false);
-const toast = useToast()
+const toast = useToast();
 const loading = ref(false);
 const userId = ref(null);
-const tickets = ref([])
-const ENGINE = environement.ENGINE_URL
+const tickets = ref([]);
+const ENGINE = environement.ENGINE_URL;
 
 const formData = ref({
   message: "",
@@ -29,7 +29,7 @@ const createNewTicket = async () => {
     const response = await createTicket(
       userId.value,
       formData.value.subject,
-      formData.value.message  
+      formData.value.message
     );
     console.log(response);
 
@@ -43,14 +43,13 @@ const createNewTicket = async () => {
       detail: "Vous allez recevoir un Message du support Bientot",
     });
 
-    fetchTickets()
+    fetchTickets();
   } catch (error) {
     console.error("Erreur lors de la création du ticket:", error);
   } finally {
     loading.value = false;
   }
 };
-
 
 const fetchUser = () => {
   const token = localStorage.getItem("token");
@@ -64,37 +63,44 @@ const fetchUser = () => {
   }
 };
 
-const fetchTickets = async() => {
-  const token = localStorage.getItem('token')
-  loading.value = true
+const fetchTickets = async () => {
+  const token = localStorage.getItem("token");
+  loading.value = true;
   try {
     const response = await fetch(`${ENGINE}/users/${userId.value}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const data = await response.json()
-    tickets.value = data.ticket
+    const data = await response.json();
+    tickets.value = data.ticket;
 
-    console.log(tickets.value, 'fetched tickets')
+    console.log(tickets.value, "fetched tickets");
   } catch (error) {
-    console.error(error)
+    console.error(error);
   }
-}
+};
 
 onMounted(() => {
   fetchUser();
-  fetchTickets()
+  fetchTickets();
 });
 </script>
 
 <template>
   <NuxtLayout name="user">
     <Toast />
-    <div class="flex flex-row justify-between items-center px-16 pt-6">
-      <h1 class="text-3xl font-oswald">Ajouter un ticket de Support</h1>
+
+    <!-- Header Section -->
+    <div
+      class="flex flex-col sm:flex-row justify-between items-center px-6 sm:px-16 pt-6 gap-4"
+    >
+      <h1 class="text-lg sm:text-2xl md:text-3xl font-oswald">
+        Ajouter un ticket de Support
+      </h1>
       <Button
         label="Ajouter un Ticket"
         icon="pi pi-plus"
+        class="w-full sm:w-auto"
         @click="showModal = true"
       />
     </div>
@@ -105,7 +111,7 @@ onMounted(() => {
       :draggable="false"
       modal
       header="Nouveau Ticket"
-      :style="{ width: '500px' }"
+      :style="{ width: '100%', maxWidth: '500px' }"
     >
       <div class="p-4 flex flex-col gap-4 font-roboto">
         <InputText
@@ -120,43 +126,44 @@ onMounted(() => {
           rows="4"
         />
 
-        <div class="flex justify-end gap-2">
+        <div class="flex flex-col sm:flex-row justify-end gap-2">
           <Button
             label="Annuler"
             icon="pi pi-times"
-            class="p-button-text"
+            class="p-button-text w-full sm:w-auto"
             @click="showModal = false"
           />
           <Button
             label="Envoyer"
             icon="pi pi-check"
-            class="p-button-primary"
+            class="p-button-primary w-full sm:w-auto"
             @click="createNewTicket"
           />
         </div>
       </div>
     </Dialog>
 
-    <Card v-for="ticket in tickets" :key="ticket.id" class="mt-4 font-oswald shadow-md">
+    <!-- Tickets List -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 px-6 sm:px-16 mt-4">
+      <Card
+        v-for="ticket in tickets"
+        :key="ticket.id"
+        class="font-oswald shadow-md"
+      >
         <template #title>{{ ticket.subject }}</template>
-        
+
         <template #content>
-          <p class="font-roboto text-gray-700">
+          <p class="font-roboto text-gray-700 text-sm sm:text-base">
             {{ ticket.message }}
           </p>
-          <Tag 
-            :icon="ticket.status === 'open' ? 'pi pi-clock' : 'pi pi-check'" 
-            :severity="ticket.status === 'open' ? 'warning' : 'success'" 
+          <Tag
+            :icon="ticket.status === 'open' ? 'pi pi-clock' : 'pi pi-check'"
+            :severity="ticket.status === 'open' ? 'warning' : 'success'"
             :value="ticket.status === 'open' ? 'En cours' : 'Clôturé'"
             class="mt-4"
           />
         </template>
       </Card>
-
+    </div>
   </NuxtLayout>
 </template>
-
-
-
-<style scoped>
-</style>

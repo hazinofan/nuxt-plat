@@ -8,6 +8,7 @@ import {
 import { useToast } from "primevue/usetoast";
 import environement from "~/core/environement";
 import axios from "axios";
+import Navbar from "~/components/navbar.vue";
 
 const email = ref("");
 const password = ref("");
@@ -206,7 +207,7 @@ async function sendLogin() {
       });
 
       localStorage.setItem("token", response.access_token);
-      router.push("/dashboard");
+      router.push("/");
     } else {
       throw new Error("Invalid response from server");
     }
@@ -231,13 +232,14 @@ const toggleForm = () => {
 
 <template>
   <div class="flex h-screen w-screen overflow-hidden relative">
+    <Navbar />
     <Toast />
     <div
-      class="flex flex-row w-full h-full shadow-lg p-8 relative transition-all duration-500"
+      class="flex flex-col md:flex-row w-full h-full shadow-lg p-6 md:p-8 relative transition-all duration-500"
     >
       <!-- Animated Section -->
       <div
-        class="hidden md:flex w-1/2 h-full text-white p-10 flex-col justify-center text-center bg-cover bg-center rounded-2xl transition-transform duration-500"
+        class="hidden md:flex w-1/2 h-full text-white p-6 md:p-10 flex-col justify-center text-center bg-cover bg-center rounded-2xl transition-transform duration-500"
         :style="{
           'background-image': showRegister
             ? 'url(/assets/Register.png)'
@@ -248,20 +250,16 @@ const toggleForm = () => {
           'translate-x-full': showRegister,
         }"
       >
-        <span class="absolute top-5 right-5 text-white text-base italic">
+        <span class="absolute top-5 right-5 text-white text-sm md:text-base italic">
           Plus de 1200+ platinium user
         </span>
 
-        <p class="text-3xl font-oswald text-white font-semibold">
-          Connectez vous , explorez votre compte et gagnez des abonnements
-          gratuit !
+        <p class="text-xl md:text-3xl font-oswald font-semibold">
+          Connectez-vous, explorez votre compte et gagnez des abonnements gratuits !
         </p>
 
-        <div
-          class="absolute bottom-5 flex flex-row gap-3 items-center"
-          style="justify-self: anchor-center"
-        >
-          <p class="text-white text-2xl">Vous n'avez pas de compte ?</p>
+        <div class="absolute bottom-5 flex flex-col md:flex-row gap-3 items-center">
+          <p class="text-white text-lg md:text-2xl">Vous n'avez pas de compte ?</p>
           <button @click="toggleForm" class="login_btn">
             {{ showRegister ? "Se Connecter" : "Inscrivez Vous" }}
           </button>
@@ -270,16 +268,16 @@ const toggleForm = () => {
 
       <!-- Login / Registration Form -->
       <div
-        class="w-full md:w-1/2 h-full flex flex-col justify-center p-52 transition-transform duration-500"
+        class="w-full md:w-1/2 h-full flex flex-col justify-center p-6 md:p-16 lg:p-24 transition-transform duration-500"
         :class="{
-          'translate-x-0': !showRegister,
-          '-translate-x-full': showRegister,
+          'lg:translate-x-0': !showRegister,
+          'lg:-translate-x-full': showRegister,
         }"
       >
         <div class="text-center">
-          <img src="/assets/logo.png" class="mx-auto mb-6" />
-          <h2 class="text-3xl font-semibold">Bienvenue chez PLATINIUM</h2>
-          <p class="text-gray-500 text-lg mt-2">
+          <img src="/assets/logo.png" class="mx-auto mb-4 md:mb-6 w-64 md:w-64" />
+          <h2 class="text-2xl md:text-3xl font-semibold">Bienvenue chez PLATINIUM</h2>
+          <p class="text-gray-500 text-base md:text-lg mt-2">
             {{
               showRegister
                 ? "Créez votre compte gratuitement."
@@ -292,39 +290,26 @@ const toggleForm = () => {
 
         <!-- Login Form -->
         <form v-if="!showRegister" @submit.prevent="sendLogin">
-          <FloatLabel variant="on" class="mt-8">
+          <FloatLabel variant="on" class="mt-6 md:mt-8">
             <InputText id="email" v-model="loginForm.email" class="w-full" />
             <label for="email">Email</label>
           </FloatLabel>
 
-          <Password
-            v-model="loginForm.password"
-            toggleMask
-            class="mt-8 w-full"
-          />
+          <Password v-model="loginForm.password" toggleMask class="mt-6 md:mt-8 w-full" />
 
-          <div
-            v-if="!showRegister"
-            class="flex items-center justify-between my-4"
-          >
-            <div class="flex items-center text-base gap-2">
-              <Checkbox
-                inputId="rememberMe"
-                name="rememberMe"
-                v-model="rememberMe"
-              />
+          <div class="flex flex-col md:flex-row items-center justify-between my-4 text-sm md:text-base">
+            <div class="flex items-center gap-2">
+              <Checkbox inputId="rememberMe" name="rememberMe" v-model="rememberMe" />
               <label for="rememberMe"> Remember me </label>
             </div>
-            <a
-              href="#"
-              class="text-purple-500 hover:text-purple-900 transition-colors text-md font-semibold"
-              >Mot de passe oublié ?</a
-            >
+            <a href="#" class="text-purple-500 hover:text-purple-900 transition-colors font-semibold">
+              Mot de passe oublié ?
+            </a>
           </div>
 
           <button
             type="submit"
-            class="px-10 py-3 rounded-tl-3xl font-oswald rounded-br-3xl w-full mt-16 rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center items-center"
+            class="px-6 md:px-10 py-3 rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all w-full mt-10 md:mt-16"
           >
             {{ showRegister ? "S'inscrire" : "Login" }}
           </button>
@@ -332,25 +317,17 @@ const toggleForm = () => {
 
         <!-- Registration Form -->
         <form v-if="showRegister" @submit.prevent="registrationForm">
-          <FloatLabel variant="on" class="mt-8">
-            <InputText
-              id="username"
-              v-model="registerForm.username"
-              class="w-full"
-            />
+          <FloatLabel variant="on" class="mt-6 md:mt-8">
+            <InputText id="username" v-model="registerForm.username" class="w-full" />
             <label for="username">Username</label>
           </FloatLabel>
 
-          <FloatLabel variant="on" class="mt-8">
-            <InputText
-              id="fullName"
-              v-model="registerForm.full_name"
-              class="w-full"
-            />
+          <FloatLabel variant="on" class="mt-6 md:mt-8">
+            <InputText id="fullName" v-model="registerForm.full_name" class="w-full" />
             <label for="fullName">Nom complet</label>
           </FloatLabel>
 
-          <FloatLabel variant="on" class="mt-8">
+          <FloatLabel variant="on" class="mt-6 md:mt-8">
             <InputText id="email" v-model="registerForm.email" class="w-full" />
             <label for="email">Email</label>
           </FloatLabel>
@@ -363,46 +340,26 @@ const toggleForm = () => {
             filter
             showClear
             placeholder="Choisissez votre pays"
-            class="w-full mt-8"
+            class="w-full mt-6 md:mt-8"
           />
 
-          <FloatLabel variant="on" class="mt-8">
-            <InputText
-              id="phone"
-              v-model="registerForm.phone_number"
-              class="w-full"
-            />
+          <FloatLabel variant="on" class="mt-6 md:mt-8">
+            <InputText id="phone" v-model="registerForm.phone_number" class="w-full" />
             <label for="phone">Téléphone</label>
           </FloatLabel>
 
-          <div class="flex flex-col md:flex-row gap-4 mt-8">
-            <!-- Password Input -->
+          <div class="flex flex-col md:flex-row gap-4 mt-6 md:mt-8">
             <FloatLabel variant="on" class="w-full">
-              <Password
-                id="password"
-                v-model="registerForm.password"
-                toggleMask
-                class="w-full"
-                input-class="w-full p-2 border border-gray-300 rounded-md"
-              />
+              <Password id="password" v-model="registerForm.password" toggleMask class="w-full" />
               <label for="password">Mot de passe</label>
             </FloatLabel>
 
-            <!-- Confirm Password Input -->
             <FloatLabel variant="on" class="w-full">
-              <Password
-                id="confirmPassword"
-                v-model="confirmPassword"
-                toggleMask
-                class="w-full"
-                input-class="w-full p-2 border border-gray-300 rounded-md"
-                :feedback="false"
-              />
+              <Password id="confirmPassword" v-model="confirmPassword" toggleMask class="w-full" />
               <label for="confirmPassword">Confirmer le mot de passe</label>
             </FloatLabel>
           </div>
 
-          <!-- Password Match Message -->
           <p v-if="!passwordsMatch" class="text-red-500 text-sm mt-2">
             ❌ Les mots de passe ne correspondent pas.
           </p>
@@ -410,26 +367,27 @@ const toggleForm = () => {
           <button
             type="submit"
             :disabled="!passwordsMatch"
-            class="px-10 py-3 rounded-tl-3xl font-oswald rounded-br-3xl w-full mt-16 rounded-tr-sm rounded-bl-sm hover:rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-6 md:px-10 py-3 rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all w-full mt-10 md:mt-16 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             S'inscrire
           </button>
         </form>
 
-        <p class="mt-4 text-center">
+        <p class="mt-4 text-center text-sm md:text-base">
           {{
             showRegister
               ? "Vous avez déjà un compte ?"
               : "Vous n'avez pas de compte ?"
           }}
           <span class="text-blue-600 cursor-pointer" @click="toggleForm">
-            {{ showRegister ? "Connectez-vous" : "Rejoignez Nous !" }}
+            {{ showRegister ? "Connectez-vous" : "Rejoignez-nous !" }}
           </span>
         </p>
       </div>
     </div>
   </div>
 </template>
+
 
 <style>
 .slide-enter-active,
