@@ -49,8 +49,6 @@ const fetchUser = () => {
   }
 };
 
-
-
 // ✅ Computed Navigation Items
 const navItems = computed(() => [
   { to: "/", icon: PrimeIcons.HOME, label: "Accueil" },
@@ -83,7 +81,6 @@ const logout = () => {
     life: 3000,
   });
 
-  router.push("/login"); 
 };
 
 // ✅ Toggle User Menu
@@ -91,14 +88,13 @@ const toggleUserMenu = () => {
   isUserMenuOpen.value = !isUserMenuOpen.value;
 };
 
-
 const fetchCartItems = () => {
   try {
     const storedCart = localStorage.getItem("cartItems");
     cartItems.value = storedCart ? JSON.parse(storedCart) : [];
   } catch (error) {
     console.error("Error parsing cart data:", error);
-    localStorage.removeItem("cartItems"); 
+    localStorage.removeItem("cartItems");
     cartItems.value = [];
   }
 };
@@ -141,8 +137,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("storage", fetchCartItems);
 });
-
-
 </script>
 
 
@@ -153,28 +147,51 @@ onUnmounted(() => {
 
     <!-- ✅ Horizontal Navbar (Hidden in Mobile) -->
     <ul class="horizontal-navbar hidden md:flex justify-center space-x-4">
-      <li v-for="(item, index) in navItems" :key="index" class="flex items-center">
+      <li
+        v-for="(item, index) in navItems"
+        :key="index"
+        class="flex items-center"
+      >
         <NuxtLink
           v-if="item.to"
           :to="item.to"
           class="icon_home flex items-center space-x-2"
           :class="{ active: route.path === item.to }"
         >
-          <i v-if="item.icon" :class="`pi ${item.icon} text-lg sm:text-xl md:text-2xl`"></i>
-          <span v-if="item.label" class="text-xs sm:text-sm md:text-base hidden sm:block">
+          <i
+            v-if="item.icon"
+            :class="`pi ${item.icon} text-lg sm:text-xl md:text-2xl`"
+          ></i>
+          <span
+            v-if="item.label"
+            class="text-xs sm:text-sm md:text-base hidden sm:block"
+          >
             {{ item.label }}
           </span>
         </NuxtLink>
 
         <!-- ✅ User Profile (If Logged In) -->
         <div v-else-if="item.user" class="user-profile relative">
-          <button @click="toggleUserMenu" class="flex items-center space-x-2">
-            <Avatar :image="item.avatar" class="avatar" size="large" shape="circle" />
-            <span class="text-white font-semibold text-sm hidden md:block">
-              {{ item.username }}
-            </span>
-            <i class="pi pi-chevron-down text-white text-xs"></i>
-          </button>
+          <button 
+  @click="toggleUserMenu" 
+  class="flex items-center gap-x-2 px-3 h-full"
+>
+  <!-- Avatar -->
+  <img
+    :src="item.avatar || '/assets/default-avatar.jpg'"
+    :alt="item.name ? `${item.name}'s profile picture` : 'Default profile avatar'"
+    class="user-avatar flex-shrink-0 align-middle"
+  />
+
+  <!-- Username (hidden on small screens) -->
+  <span class="text-white font-semibold text-sm hidden md:block">
+    {{ item.username }}
+  </span>
+
+  <!-- Dropdown Icon -->
+  <i class="pi pi-chevron-down text-white text-xs"></i>
+</button>
+
 
           <!-- ✅ Dropdown Menu -->
           <Transition name="fade">
@@ -218,8 +235,12 @@ onUnmounted(() => {
           :aria-label="item.label || 'Bouton de navigation'"
         >
           <i :class="`pi ${item.icon} text-lg sm:text-xl md:text-2xl`"></i>
-          <span v-if="item.icon === PrimeIcons.SHOPPING_CART && cartItems.length > 0"
-            class="cart-badge">
+          <span
+            v-if="
+              item.icon === PrimeIcons.SHOPPING_CART && cartItems.length > 0
+            "
+            class="cart-badge"
+          >
             {{ cartItems.length }}
           </span>
         </button>
@@ -228,8 +249,15 @@ onUnmounted(() => {
 
     <!-- ✅ Mobile Dropdown Menu -->
     <Transition name="slide-fade">
-      <ul v-if="isMobileMenuOpen" class="mobile-menu md:hidden bg-gray-800 p-4 rounded-md">
-        <li v-for="(item, index) in navItems" :key="index" class="flex flex-col py-2">
+      <ul
+        v-if="isMobileMenuOpen"
+        class="mobile-menu md:hidden bg-gray-800 p-4 rounded-md"
+      >
+        <li
+          v-for="(item, index) in navItems"
+          :key="index"
+          class="flex flex-col py-2"
+        >
           <NuxtLink
             v-if="item.to"
             :to="item.to"
@@ -246,7 +274,12 @@ onUnmounted(() => {
 
     <!-- ✅ Cart Sidebar -->
     <div class="cart-sidebar" :class="{ open: isCartOpen }">
-      <NuxtImg src="/assets/logo2.png" format="webp" alt="Platinium IPTV Logo" class="mx-auto"/>
+      <NuxtImg
+        src="/assets/logo2.png"
+        format="webp"
+        alt="Platinium IPTV Logo"
+        class="mx-auto"
+      />
       <div class="cart-header flex justify-between">
         <h2 class="text-white">Votre Panier</h2>
         <button @click="toggleCart" aria-label="Fermer le panier">
@@ -257,14 +290,25 @@ onUnmounted(() => {
       <!-- ✅ Cart Items -->
       <div class="cart-items p-4 bg-white rounded-lg">
         <template v-if="cartItems.length > 0">
-          <div v-for="item in cartItems" :key="item.id"
-            class="cart-item flex items-center justify-between border-b py-3">
-            <img :src="item.photos" class="w-16 h-16 object-cover rounded-md border"/>
+          <div
+            v-for="item in cartItems"
+            :key="item.id"
+            class="cart-item flex items-center justify-between border-b py-3"
+          >
+            <img
+              :src="item.photos"
+              class="w-16 h-16 object-cover rounded-md border"
+            />
             <div>
               <p class="text-lg font-semibold text-center">{{ item.name }}</p>
               <div class="flex items-center space-x-4 justify-center">
-                <p class="text-green-600 font-semibold">{{ item.price }}€ x {{ item.quantity }}</p>
-                <button @click="removeFromCart(item.id)" class="p-2 text-red-600 hover:text-red-800">
+                <p class="text-green-600 font-semibold">
+                  {{ item.price }}€ x {{ item.quantity }}
+                </p>
+                <button
+                  @click="removeFromCart(item.id)"
+                  class="p-2 text-red-600 hover:text-red-800"
+                >
                   🗑️
                 </button>
               </div>
@@ -276,12 +320,25 @@ onUnmounted(() => {
           </div>
 
           <div class="flex flex-col gap-3 md:flex-row justify-center mt-5">
-            <Button label="Vider le Panier" class="p-button-outlined p-button-danger" @click="clearCart"/>
-            <Button label="checkout" class="p-button-outlined p-button-success" @click="$router.push('/checkout'); toggleCart();"/>
+            <Button
+              label="Vider le Panier"
+              class="p-button-outlined p-button-danger"
+              @click="clearCart"
+            />
+            <Button
+              label="checkout"
+              class="p-button-outlined p-button-success"
+              @click="
+                $router.push('/checkout');
+                toggleCart();
+              "
+            />
           </div>
         </template>
 
-        <p v-else class="text-center text-gray-500 py-4"> 🛒 Votre panier est vide </p>
+        <p v-else class="text-center text-gray-500 py-4">
+          🛒 Votre panier est vide
+        </p>
       </div>
     </div>
   </nav>
@@ -392,5 +449,35 @@ onUnmounted(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.user-avatar {
+  width: 25px; /* Default size */
+  height: 25px;
+  border-radius: 50%;
+  object-fit: cover; 
+  transition: all 0.3s ease-in-out; 
+}
+
+/* Medium Screens (Tablets) */
+@media (min-width: 640px) { 
+  .user-avatar {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* Large Screens (Desktops) */
+@media (min-width: 1024px) { 
+  .user-avatar {
+    width: 33px;
+    height: 33px;
+  }
+}
+
+/* Hover Effect (Optional) */
+.user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

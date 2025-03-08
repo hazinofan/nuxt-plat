@@ -30,7 +30,6 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-04-03',
   css: ['~/assets/css/main.css','primeicons/primeicons.css'],
-  plugins: ["~/plugins/websocket.js"],
   devtools: { enabled: true },
   modules: [
     '@primevue/nuxt-module',

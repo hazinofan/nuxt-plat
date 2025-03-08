@@ -2,16 +2,24 @@
 import { jwtDecode } from "jwt-decode";
 import { ref, onMounted } from "vue";
 import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable"; // Auto-table for structured tables
+import AOS from "aos";
 import environement from "~/core/environement";
 
 const userId = ref(null);
 const orders = ref([]);
 const ENGINE = environement.ENGINE_URL;
+definePageMeta({
+  middleware: "auth",
+});
+
+const authStore = useAuthStore(); 
 
 const fetchUser = () => {
   const token = localStorage.getItem("token");
-  if (!token) return;
+  if (!token) {
+    authStore.isAuthenticated = false;
+    return;
+  }
 
   try {
     const userData = jwtDecode(token);
@@ -19,6 +27,7 @@ const fetchUser = () => {
     console.log(userId.value);
   } catch (error) {
     console.error("Invalid token", error);
+    authStore.isAuthenticated = false;
   }
 };
 
@@ -81,7 +90,7 @@ const generateInvoice = (order) => {
   }
 
   // ✅ Order Total & Payment Status
-  const lastProductY = 100 + (order.products.length * 8) + 10;
+  const lastProductY = 100 + order.products.length * 8 + 10;
   doc.setFontSize(12);
   doc.text(`Prix Total: ${order.total_price} €`, 20, lastProductY);
   doc.text(
@@ -93,7 +102,11 @@ const generateInvoice = (order) => {
   // ✅ Footer / Signature
   doc.setFontSize(10);
   doc.setTextColor(100);
-  doc.text("Merci pour votre achat chez Platinium IPTV !", 20, lastProductY + 30);
+  doc.text(
+    "Merci pour votre achat chez Platinium IPTV !",
+    20,
+    lastProductY + 30
+  );
   doc.text("Signature du vendeur", 20, lastProductY + 50);
   doc.line(20, lastProductY + 55, 80, lastProductY + 55); // Draw signature line
 
@@ -103,8 +116,8 @@ const generateInvoice = (order) => {
   window.open(pdfUrl, "_blank");
 };
 
-
 onMounted(async () => {
+  AOS.init();
   await fetchUser();
   fetchOrders();
 });
@@ -112,25 +125,66 @@ onMounted(async () => {
 
 <template>
   <NuxtLayout name="user">
-    <div class="p-4 sm:p-6 lg:p-8 space-y-4">
+    <!-- 🚨 Show Custom Unauthorized Message -->
+    <div
+      v-if="!authStore.isAuthenticated"
+      class="flex items-center justify-center min-h-screen px-4"
+    >
+      <div
+        class="bg-white shadow-lg rounded-lg p-6 text-center max-w-lg w-full sm:w-3/4 lg:w-1/2 xl:w-1/3"
+      >
+        <h2
+          class="text-xl sm:text-2xl flex flex-row gap-2 items-center justify-center font-semibold text-red-500"
+        >
+          <i class="pi pi-ban text-3xl sm:text-4xl"></i> Accès Refusé
+        </h2>
+        <p class="text-gray-700 mt-2 text-sm sm:text-base">
+          Vous devez être connecté pour accéder à cette page.
+        </p>
+        <button
+          class="mt-4 w-full sm:w-auto px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition"
+          @click="router.push('/login')"
+        >
+          Aller à la page de connexion
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="p-4 sm:p-6 lg:p-8 space-y-4"
+      data-aos="fade-down"
+      data-aos-delay="400"
+      v-else
+    >
       <h1 class="text-2xl sm:text-3xl md:text-4xl font-oswald font-semibold">
         Votre historique de commandes :
       </h1>
 
       <!-- ✅ Show message if no orders -->
-      <div v-if="orders.length === 0" class="text-center text-gray-600 p-6 sm:p-8">
+      <div
+        v-if="orders.length === 0"
+        class="text-center text-gray-600 p-6 sm:p-8"
+      >
         <p class="text-lg sm:text-xl font-semibold">Aucune commande trouvée.</p>
         <p class="text-gray-500 text-sm sm:text-base">
           Vous n'avez pas encore passé de commande.
         </p>
-        <NuxtLink to="/produits" class="text-purple-500 font-semibold font-roboto hover:underline">
+        <NuxtLink
+          to="/produits"
+          class="text-purple-500 font-semibold font-roboto hover:underline"
+        >
           Explorer les produits →
         </NuxtLink>
       </div>
 
       <!-- ✅ Make Table Responsive -->
       <div v-else class="overflow-x-auto">
-        <DataTable :value="orders" stripedRows tableStyle="min-width: 40rem sm:min-w-[50rem]" :emptyMessage="'Aucune commande disponible'">
+        <DataTable
+          :value="orders"
+          stripedRows
+          tableStyle="min-width: 40rem sm:min-w-[50rem]"
+          :emptyMessage="'Aucune commande disponible'"
+        >
           <!-- ID -->
           <Column field="id" header="ID de Commande"></Column>
 

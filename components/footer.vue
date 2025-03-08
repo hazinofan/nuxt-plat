@@ -1,5 +1,5 @@
 <template>
-  <footer class="bg-purple-200/55 py-12 px-5">
+  <footer class="bg-purple-700/15 py-12 px-5">
     <div class="container mx-auto">
       <div class="text-center">
         <div class="text-3xl leading-10 text-purple-800 font-bold mb-4">
