@@ -61,21 +61,17 @@ const fetchUser = () => {
   }
 
   try {
-    // ✅ First, check localStorage for updated user data
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       user.value = JSON.parse(storedUser);
-      console.log("🔹 User loaded from localStorage:", user.value);
       return;
     }
 
-    // ✅ If no updated user data, decode the token
     const userData = jwtDecode(token);
     user.value = { ...userData };
-    console.log("🔹 User loaded from token:", user.value);
   } catch (error) {
     console.error("❌ Invalid token", error);
-    authStore.isAuthenticated = false; // ✅ Token is invalid, mark as not authenticated
+    authStore.isAuthenticated = false;
   }
 };
 
@@ -92,8 +88,6 @@ const updateUser = async () => {
     };
 
     const response = await updateUserInfo(user.value.id, updatedData);
-
-    console.log("✅ User updated:", response);
 
     user.value = { ...user.value, ...response.user };
     localStorage.setItem("user", JSON.stringify(response.user));
@@ -127,7 +121,6 @@ const changePassword = () => {
     alert("Les mots de passe ne correspondent pas !");
     return;
   }
-  console.log("Password changed successfully:", passwords.value);
   alert("Mot de passe modifié avec succès !");
 };
 

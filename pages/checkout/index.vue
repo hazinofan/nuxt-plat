@@ -96,9 +96,7 @@ async function getAllUsers() {
   try {
     const response = await fetch(`${ENGINE_URL}/users`);
     const data = await response.json();
-    console.log(data, "users");
     allCoupons.value = data.flatMap((user) => user.coupons || []);
-    console.log(allCoupons.value, "all coupons");
     return allCoupons;
   } catch (error) {
     console.error("❌ Error fetching users:", error);
@@ -138,8 +136,6 @@ const loggedUser = ref({
   country: "",
 });
 
-console.log("logged ", loggedUser.value);
-
 const form = ref({
   fullName: "",
   email: "",
@@ -163,7 +159,6 @@ watchEffect(() => {
     }
   }
 });
-
 
 const updatePhoneCode = () => {
   if (!selectedCountry.value) {
@@ -200,8 +195,6 @@ const handleOrderSubmit = async (event) => {
     .join("");
 
   try {
-    console.log(userId.value, "User ID Value");
-
     if (userId.value) {
       // ✅ Authenticated user → Create order in backend
       const orderResponse = await createOrder(
@@ -209,7 +202,6 @@ const handleOrderSubmit = async (event) => {
         totalPrice.value,
         cartItems.value.map((item) => item.name)
       );
-      console.log(orderResponse, "✅ Order successfully created!");
     }
 
     // ✅ Clear cart after order
@@ -230,7 +222,6 @@ const handleOrderSubmit = async (event) => {
         );
 
         allCoupons.value = allCoupons.value.filter((c) => c.id !== coupon.id);
-        console.log(`✅ Coupon ${coupon.code} deleted successfully.`);
       } catch (error) {
         console.error("❌ Error deleting coupon:", error.message);
       }
@@ -264,35 +255,45 @@ const handleOrderSubmit = async (event) => {
         <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
           <h1 style="color: #D32F2F;">Bonjour ${customerInfo.name},</h1>
           <p>Merci pour votre commande chez <strong>Platinium IPTV</strong> !</p>
-          <p>Votre commande est en attente de paiement.</p>
-          <p>Vous recevrez bientôt une facture à régler par PayPal ou carte de crédit.</p>
-          <h2>🛒 Votre commande :</h2>
-          <ul>${orderSummary}</ul>
-          <p><strong>Total :</strong> ${totalPrice.value}€</p>
+          
+          <p>Pour finaliser votre achat, veuillez effectuer un paiement du montant de votre facture via PayPal à l’adresse suivante :</p>
+
+          <p style="font-size: 18px; font-weight: bold; background: #f2f2f2; padding: 10px; text-align: center; border-radius: 5px;">
+            ahmedaminemaarouf@gmail.com
+          </p>
+
+          <p>Lors du paiement, veuillez choisir "<strong>Cadeau</strong>" comme motif.</p>
+
+          <p>Une fois le paiement effectué, merci de nous envoyer une confirmation afin que nous puissions vous fournir votre abonnement immédiatement.</p>
+
+          <p>Si vous avez des questions, n’hésitez pas à nous contacter.</p>
+
           <hr style="border: 1px solid #ccc; margin: 20px 0;">
+          <p style="font-size: 16px; font-weight: bold;">Cordialement,</p>
+          <p style="font-size: 14px;">SUPPORT PLATINIUM IPTV</p>
+
           <table style="width: 100%; text-align: left;">
             <tr>
               <td>
-                <img src="https://yourwebsite.com/logo.png" alt="Platinium IPTV Logo" width="150">
+                <img src="https://i.imgur.com/PKDd5El.png" alt="Platinium IPTV Logo" width="150">
               </td>
               <td style="padding-left: 15px;">
                 <p style="font-size: 14px; margin: 0;">
-                  <strong>Marcel Bielsa</strong><br>
-                  Directeur du Support Client et Commandes<br>
-                  <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">support@platinium-iptv.com</a><br>
-                  📞 <a href="tel:+1234567890" style="color: #D32F2F; text-decoration: none;">+123 456 7890</a>
+                  <strong>Service Client</strong><br>
+                  <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">📩 support@platinium-iptv.com</a><br>
+                  <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="WhatsApp" width="24" style="vertical-align: middle; margin-right: 5px;">
+                  <a href="tel:+212684925665" style="color: #D32F2F; text-decoration: none;">+212 68492 5665</a>
                 </p>
               </td>
             </tr>
           </table>
+
           <p style="font-size: 12px; color: #777;">
             Cet e-mail est généré automatiquement, merci de ne pas y répondre.
           </p>
         </div>
       `,
     });
-
-    console.log("✅ Emails Sent Successfully");
 
     toast.add({
       severity: "success",
@@ -316,7 +317,7 @@ const handleOrderSubmit = async (event) => {
   }
 };
 
-onMounted(async() => {
+onMounted(async () => {
   await checkToken();
   await getAllUsers();
   try {

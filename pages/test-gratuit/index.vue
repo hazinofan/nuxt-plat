@@ -110,20 +110,23 @@ const submitForm = async () => {
         Nous avons bien reçu votre demande d'essai IPTV de 2 heures. Nos équipes vous contacteront bientôt avec vos identifiants de connexion.
       </p>
       <p style="font-size: 16px;">
-        Merci de vérifier votre boîte mail, y compris les spams.
+        Veuillez vérifier votre boîte de réception, y compris le dossier des spams.  
+        Notre support WhatsApp peut également vous contacter pour vous envoyer vos identifiants d’essai.
       </p>
       <hr style="border: 1px solid #ccc; margin: 20px 0;">
       <table style="width: 100%; text-align: left;">
         <tr>
           <td>
-            <img src="https://iili.io/32HFA74.png" alt="Platinium IPTV Logo" width="150">
+            <img src="https://i.imgur.com/PKDd5El.png" alt="Platinium IPTV Logo" width="150">
           </td>
           <td style="padding-left: 15px;">
             <p style="font-size: 14px; margin: 0;">
               <strong>Laurien Bureaux</strong><br>
               Directeur du Support Client<br>
-              <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">support@platinium-iptv.com</a><br>
-              📞 <a href="tel:+1 (276) 300-1517" style="color: #D32F2F; text-decoration: none;">+1 (276) 300-1517</a>
+              <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none; display:flex; flex-direction: row; gap: 5px"> 📩 support@platinium-iptv.com</a><br>
+              <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="WhatsApp" width="24" style="vertical-align: middle; margin-right: 5px;">
+              <a href="tel:+212 68492 5665" style="color: #D32F2F; text-decoration: none;">+212 68492 5665</a>
+              </a>
             </p>
           </td>
         </tr>
@@ -136,7 +139,6 @@ const submitForm = async () => {
       text: `Bonjour ${form.value.fullName},\nNous avons bien reçu votre demande d'essai IPTV.\nMerci de vérifier votre boîte mail.\nPlatinium IPTV Team\n\nSupport:\nAmine ZEGGANI - Directeur du Support Client\nEmail: support@platinium-iptv.com\nTéléphone: +123 456 7890`,
     });
 
-    console.log("✅ Emails Sent Successfully");
     toast.add({
       severity: "success",
       summary: "Demande Envoyée",

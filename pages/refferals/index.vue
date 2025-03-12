@@ -59,7 +59,6 @@ const fetchUser = () => {
 
   try {
     const userData = jwtDecode(token);
-    console.log(userData);
     user.value = userData;
   } catch (error) {
     console.error("Invalid token", error);

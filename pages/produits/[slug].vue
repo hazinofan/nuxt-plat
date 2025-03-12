@@ -16,10 +16,7 @@ const toast = useToast();
 
 onMounted(async () => {
   try {
-    console.log("Route parameters:", route.params); // Debugging
-
     const productSlug = route.params.slug;
-    console.log("Extracted slug:", productSlug); // Check if slug exists
 
     if (!productSlug || typeof productSlug !== "string") {
       throw new Error("Invalid slug received from route params");

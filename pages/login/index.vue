@@ -54,6 +54,18 @@ const countries = ref([
   { name: "Qatar", code: "+974" },
   { name: "Liban", code: "+961" },
 ]);
+
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+
+const togglePassword = () => {
+  showPassword.value = !showPassword.value;
+};
+
+const toggleConfirmPassword = () => {
+  showConfirmPassword.value = !showConfirmPassword.value;
+};
+
 const ENGINE_URL = environement.ENGINE_URL;
 const confirmPassword = ref("");
 const loadingData = ref(false);
@@ -75,6 +87,7 @@ const passwordsMatch = computed(() => {
 });
 
 async function registrationForm() {
+  loadingData.value = true;
   if (!passwordsMatch.value) {
     toast.add({
       severity: "error",
@@ -145,8 +158,9 @@ async function registrationForm() {
                 <p style="font-size: 14px; margin: 0;">
                   <strong>Support Platinium IPTV</strong><br>
                   Service Client<br>
-                  <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none;">support@platinium-iptv.com</a><br>
-                  📞 <a href="tel:+1234567890" style="color: #D32F2F; text-decoration: none;">+123 456 7890</a>
+                  <a href="mailto:support@platinium-iptv.com" style="color: #D32F2F; text-decoration: none; display:flex; flex-direction: row; gap: 5px"> 📩 support@platinium-iptv.com</a><br>
+                  <img src="https://img.icons8.com/?size=100&id=16713&format=png&color=000000" alt="WhatsApp" width="24" style="vertical-align: middle; margin-right: 5px;">
+                  <a href="tel:+212 68492 5665" style="color: #D32F2F; text-decoration: none;">+212 68492 5665</a>
                 </p>
               </td>
             </tr>
@@ -177,6 +191,8 @@ async function registrationForm() {
       detail: errorMessage,
       life: 3000,
     });
+  } finally {
+    loadingData.value = false;
   }
 }
 
@@ -193,8 +209,6 @@ async function sendLogin() {
       loginForm.value.email,
       loginForm.value.password
     );
-
-    console.log(response, "login response");
 
     if (response.access_token) {
       toast.add({
@@ -289,6 +303,7 @@ onMounted(() => {
 
 <template>
   <NuxtLayout name="support">
+    <Navbar />
     <div
       class="flex h-screen w-screen overflow-hidden relative"
       data-aos="fade-down"
@@ -370,13 +385,25 @@ onMounted(() => {
               <label for="email">Email</label>
             </FloatLabel>
 
-            <Password
-              v-model="loginForm.password"
-              toggleMask
-              placeholder="Entrez Votre Mot de pass"
-              class="mt-6 md:mt-8 w-full"
-              aria-label="Entrez votre mot de passe"
-            />
+            <div class="relative w-full mt-5">
+              <input
+                :type="showPassword ? 'text' : 'password'"
+                v-model="loginForm.password"
+                placeholder="Entrez Votre Mot de Passe"
+                class="w-full p-3 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#9852a6]"
+                aria-label="Entrez votre mot de passe"
+              />
+              <button
+                type="button"
+                @click="togglePassword"
+                class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-[#9852a6]"
+              >
+                <i
+                  :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                  class="text-xl"
+                ></i>
+              </button>
+            </div>
 
             <div
               class="flex flex-col md:flex-row items-center justify-between my-4 text-sm md:text-base"
@@ -406,9 +433,18 @@ onMounted(() => {
           </form>
 
           <!-- Registration Form -->
-          <form v-if="showRegister" @submit.prevent="registrationForm">
-            <div class="flex flex-row gap-3">
-              <FloatLabel variant="on" class="mt-6 md:mt-8">
+          <form
+            v-if="showRegister"
+            @submit.prevent="registrationForm"
+            class="p-6 md:p-8 w-full max-w-lg mx-auto"
+          >
+            <h2 class="text-2xl font-bold text-center mb-6 text-gray-800">
+              Créer un compte
+            </h2>
+
+            <!-- Username & Full Name -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FloatLabel variant="on">
                 <InputText
                   id="username"
                   v-model="registerForm.username"
@@ -417,7 +453,7 @@ onMounted(() => {
                 <label for="username">Username</label>
               </FloatLabel>
 
-              <FloatLabel variant="on" class="mt-6 md:mt-8">
+              <FloatLabel variant="on">
                 <InputText
                   id="fullName"
                   v-model="registerForm.full_name"
@@ -427,7 +463,8 @@ onMounted(() => {
               </FloatLabel>
             </div>
 
-            <FloatLabel variant="on" class="mt-6 md:mt-8">
+            <!-- Email -->
+            <FloatLabel variant="on" class="mt-4">
               <InputText
                 id="email"
                 v-model="registerForm.email"
@@ -436,6 +473,7 @@ onMounted(() => {
               <label for="email">Email</label>
             </FloatLabel>
 
+            <!-- Country -->
             <Select
               v-model="registerForm.country"
               :options="countries"
@@ -444,10 +482,11 @@ onMounted(() => {
               filter
               showClear
               placeholder="Choisissez votre pays"
-              class="w-full mt-6 md:mt-8"
+              class="w-full mt-4"
             />
 
-            <FloatLabel variant="on" class="mt-6 md:mt-8">
+            <!-- Phone Number -->
+            <FloatLabel variant="on" class="mt-4">
               <InputText
                 id="phone"
                 v-model="registerForm.phone_number"
@@ -456,38 +495,75 @@ onMounted(() => {
               <label for="phone">Téléphone</label>
             </FloatLabel>
 
-            <div class="flex flex-col md:flex-row gap-4 mt-6 md:mt-8">
-              <FloatLabel variant="on" class="w-full">
-                <Password
+            <!-- Password & Confirm Password -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <!-- Password -->
+              <div class="relative">
+                <input
+                  :type="showPassword ? 'text' : 'password'"
                   id="password"
                   v-model="registerForm.password"
-                  toggleMask
-                  class="w-full"
+                  class="w-full p-3 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#a65286]"
                   aria-label="Entrez votre mot de passe"
                 />
-                <label for="password">Mot de passe</label>
-              </FloatLabel>
+                <label
+                  for="password"
+                  class="absolute left-3 top-0 text-gray-500 text-sm"
+                >
+                  Mot de passe
+                </label>
+                <button
+                  type="button"
+                  @click="togglePassword('password')"
+                  class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-[#a65286]"
+                >
+                  <i
+                    :class="showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"
+                    class="text-xl"
+                  ></i>
+                </button>
+              </div>
 
-              <FloatLabel variant="on" class="w-full">
-                <Password
+              <!-- Confirm Password -->
+              <div class="relative">
+                <input
+                  :type="showConfirmPassword ? 'text' : 'password'"
                   id="confirmPassword"
                   v-model="confirmPassword"
-                  toggleMask
-                  class="w-full"
+                  class="w-full p-3 border rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#a65286]"
                   aria-label="Confirmez votre mot de passe"
                 />
-                <label for="confirmPassword">Confirmer le mot de passe</label>
-              </FloatLabel>
+                <label
+                  for="confirmPassword"
+                  class="absolute left-3 top-0 text-gray-500 text-sm"
+                >
+                  Confirmer le mot de passe
+                </label>
+                <button
+                  type="button"
+                  @click="toggleConfirmPassword('confirmPassword')"
+                  class="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-[#a65286]"
+                >
+                  <i
+                    :class="
+                      showConfirmPassword ? 'pi pi-eye-slash' : 'pi pi-eye'
+                    "
+                    class="text-xl"
+                  ></i>
+                </button>
+              </div>
             </div>
 
+            <!-- Password Match Warning -->
             <p v-if="!passwordsMatch" class="text-red-500 text-sm mt-2">
               ❌ Les mots de passe ne correspondent pas.
             </p>
 
+            <!-- Submit Button -->
             <button
               type="submit"
               :disabled="!passwordsMatch"
-              class="px-6 md:px-10 py-3 mt-5 rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-6 py-3 mt-6 rounded-lg bg-gradient-to-r from-blue-800 to-purple-500 text-white text-lg font-semibold shadow-lg hover:opacity-90 hover:shadow-xl transition-all w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               S'inscrire
             </button>

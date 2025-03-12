@@ -24,7 +24,6 @@ const fetchUser = () => {
   try {
     const userData = jwtDecode(token);
     userId.value = userData.id;
-    console.log(userId.value);
   } catch (error) {
     console.error("Invalid token", error);
     authStore.isAuthenticated = false;
@@ -46,7 +45,6 @@ const fetchOrders = async () => {
 
     const data = await response.json();
     orders.value = data.orders || [];
-    console.log(orders.value, "value");
   } catch (error) {
     console.error("Erreur lors de la récupération des commandes", error);
   }

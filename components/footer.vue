@@ -31,7 +31,7 @@
         <div class="flex flex-col items-center text-gray-600">
           <p class="flex items-center mb-4 gap-2 text-lg">
             <span class="text-purple-600 text-2xl">📞</span>
-            +1 (276) 300-1517
+            +212 68492 5665
           </p>
           <p class="flex items-center gap-2 text-lg mb-9">
             <i class="pi pi-envelope text-2xl"></i>

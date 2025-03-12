@@ -1,18 +1,27 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
+import { jwtDecode } from "jwt-decode";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useToast } from "primevue/usetoast";
+import environement from "~/core/environement";
 
 // Variables d'état
 const cartItems = ref([]);
 const orderNumber = Math.floor(Math.random() * (1000 - 500 + 1)) + 500;
 const customerInfo = ref({ name: "", email: "", phone: "", country: "" });
 const router = useRouter()
+const userId = ref(null)
+const orders = ref([]);
+const authStore = useAuthStore(); 
 const toast = useToast() 
+const orderId = ref(null)
+const ENGINE = environement.ENGINE_URL
 
 // Récupérer les données depuis le Local Storage
 onMounted(() => {
+  fetchUser()
+  fetchOrders()
   try {
     const storedItems = localStorage.getItem("cartItems");
     cartItems.value = storedItems ? JSON.parse(storedItems) : [];
@@ -28,6 +37,51 @@ onMounted(() => {
     );
   }
 });
+
+const fetchUser = () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    authStore.isAuthenticated = false;
+    return;
+  }
+
+  try {
+    const userData = jwtDecode(token);
+    userId.value = userData.id;
+  } catch (error) {
+    console.error("Invalid token", error);
+    authStore.isAuthenticated = false;
+  }
+};
+
+const fetchOrders = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token || !userId.value) return;
+
+    const response = await fetch(`${ENGINE}/users/${userId.value}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Erreur de récupération des commandes");
+    }
+
+    const data = await response.json();
+    orders.value = data.orders || [];
+
+    if (orders.value.length > 0) {
+      // ✅ Get the latest order (assuming orders have an 'id' field)
+      orderId.value = orders.value.reduce((max, order) =>
+        order.id > max.id ? order : max
+      ).id;
+    }
+
+    console.log(orderId.value)
+  } catch (error) {
+    console.error("Erreur lors de la récupération des commandes", error);
+  }
+};
 
 // Calculer le prix total
 const totalPrice = computed(() =>
@@ -79,7 +133,6 @@ function redirect() {
       life: 8000,
     });
   } catch (error) {
-    console.log(error, 'error')
   }
 }
 </script>
@@ -103,7 +156,7 @@ function redirect() {
       </div>
 
       <p class="text-2xl text-gray-600 mb-10">
-        Numéro de commande : {{ orderNumber }} <br />
+        ID de votre Commande : #{{ orderId }} <br />
         Merci pour votre achat !
       </p>
 

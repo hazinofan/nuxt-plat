@@ -17,10 +17,8 @@ const fetchBlog = async () => {
   try {
     const response = await getBlogBySlug(slug);
     blog.value = response;
-    console.log(blog.value);
   } catch (err) {
     error.value = "Failed to fetch the blog post. Please try again later.";
-    console.log(err);
   } finally {
     loading.value = false;
   }

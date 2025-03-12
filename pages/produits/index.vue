@@ -6,6 +6,7 @@ import "aos/dist/aos.css";
 import "../../assets/css/products.css";
 import { useToast } from "primevue/usetoast";
 import { getProducts } from "~/core/services/products.services";
+import { ProgressSpinner } from "primevue";
 
 const products = ref([]);
 const loading = ref(false);
@@ -219,6 +220,9 @@ useHead({
 
       <!-- Toast Component for Notifications -->
       <Toast />
+      <div class="fixed inset-0 flex justify-center items-center bg-opacity-50">
+        <ProgressSpinner v-if="loading" />
+      </div>
 
       <div class="container" data-aos="fade-down" data-aos-delay="400">
         <div
@@ -244,8 +248,11 @@ useHead({
               <button class="cartBtn" @click="addToCart(product)">
                 Add to Cart
               </button>
-              <NuxtLink :to="`/produits/${product.slug}`">
-                <button class="btn_details mt-3">View Details</button>
+              <NuxtLink
+                class="justify-center"
+                :to="`/produits/${product.slug}`"
+              >
+                <button class="btn_details mt-3">Plus de Details</button>
               </NuxtLink>
             </div>
           </div>

@@ -30,7 +30,6 @@ const fetchCoupons = async () => {
 
     const data = await response.json();
     coupons.value = data.coupons;
-    console.log(coupons.value.expiry, "coupons ");
   } catch (error) {
     console.error("Erreur lors de la récupération des coupons", error);
   }

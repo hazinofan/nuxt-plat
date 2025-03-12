@@ -51,8 +51,6 @@ const fetchData = async () => {
     coupons.value = data.coupons || [];
     orders.value = data.orders || [];
 
-    console.log("Fetched Orders:", orders.value); // Debugging Step ✅
-
     processChartData(); // Update chart after fetching orders
   } catch (error) {
     console.error("Erreur lors de la récupération des données", error);
@@ -74,14 +72,13 @@ const processChartData = () => {
         const monthIndex = parsedDate.getMonth(); // Get month (0 = Jan, 11 = Dec)
         ordersPerMonth[monthIndex]++;
       } else {
-        console.warn("Invalid date format:", order.created_at); // Debugging
+        console.warn("Invalid date format:", order.created_at); 
       }
     } else {
-      console.warn("Order missing created_at:", order); // Debugging
+      console.warn("Order missing created_at:", order);
     }
   });
 
-  console.log("Updated Orders per Month:", ordersPerMonth); // Debugging
 
   chartData.value = {
     labels: [

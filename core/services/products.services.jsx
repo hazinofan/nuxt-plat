@@ -34,14 +34,12 @@ export const addProduct = async (productData) => {
   try {
     productData.slug = slugify(productData.name);
 
-    console.log("Sending payload to API:", productData); 
     const response = await axios.post(`${BASE_URL}`, productData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
         "Content-Type": "application/json",
       },
     });
-    console.log("API response:", response.data); 
     return response.data;
   } catch (error) {
     console.error("Error in addProduct service:", error);

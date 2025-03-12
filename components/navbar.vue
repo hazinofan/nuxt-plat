@@ -42,7 +42,6 @@ const fetchUser = () => {
     }
 
     user.value = decoded;
-    console.log("User Data:", user.value);
   } catch (error) {
     console.error("Invalid token", error);
     logout();

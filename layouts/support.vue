@@ -11,7 +11,7 @@ const items = ref([
         label: 'WhatsApp Support',
         icon: 'pi pi-whatsapp',
         command: () => {
-            window.open('https://wa.me/212665078502', '_blank'); // Replace with your WhatsApp number
+            window.open('https://wa.me/21284925665', '_blank'); 
         }
     },
     {
@@ -20,7 +20,14 @@ const items = ref([
         command: () => {
             router.push('/support');
         }
-    }
+    },
+    {
+        label: 'Promo du mois',
+        icon: 'pi pi-ticket',
+        command: () => {
+            router.push('/produits/abonnement-iptv-premium-15-mois--abonnement-iptv-premium-3-mois');
+        }
+    },
 ]);
 
 </script>
