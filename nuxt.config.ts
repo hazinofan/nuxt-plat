@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
-    preset: 'netlify-edge', // ✅ Use 'netlify-edge' instead of 'netlify' or 'netlify-legacy'
+    preset: 'netlify-edge', 
     compressPublicAssets: true,
   },
   app: {
