@@ -5,6 +5,7 @@ import { useHead } from "#imports";
 import { getBlogBySlug } from "~/core/services/blogs.services";
 import Navbar from "~/components/navbar.vue";
 import AOS from "aos";
+import { NuxtLink } from "#components";
 
 const route = useRoute();
 const slug = route.params.slug;
@@ -26,16 +27,30 @@ const fetchBlog = async () => {
 
 // ✅ Computed Meta Tags (Ensures `useHead` Waits for Data)
 const pageTitle = computed(() => blog.value?.title || "Blog - Platinium IPTV");
-const pageDescription = computed(() => blog.value?.excerpt || "Découvrez les dernières actualités et tendances IPTV sur Platinium IPTV.");
+const pageDescription = computed(
+  () =>
+    blog.value?.excerpt ||
+    "Découvrez les dernières actualités et tendances IPTV sur Platinium IPTV."
+);
 const pageAuthor = computed(() => blog.value?.author || "Platinium IPTV");
-const pageImage = computed(() => blog.value?.coverImage || "https://platinium-iptv.com/images/default-thumbnail.jpg");
-const pageUrl = computed(() => `https://platinium-iptv.com/blogs/${blog.value?.slug || slug}`);
+const pageImage = computed(
+  () =>
+    blog.value?.coverImage ||
+    "https://platinium-iptv.com/images/default-thumbnail.jpg"
+);
+const pageUrl = computed(
+  () => `https://platinium-iptv.com/blogs/${blog.value?.slug || slug}`
+);
 
 useHead(() => ({
   title: pageTitle.value,
   meta: [
     { name: "description", content: pageDescription.value },
-    { name: "keywords", content: "IPTV, abonnement IPTV, blog IPTV, tendances IPTV, streaming, chaînes TV en ligne, IPTV premium, VOD" },
+    {
+      name: "keywords",
+      content:
+        "IPTV, abonnement IPTV, blog IPTV, tendances IPTV, streaming, chaînes TV en ligne, IPTV premium, VOD",
+    },
     { name: "author", content: pageAuthor.value },
     { name: "robots", content: "index, follow" },
 
@@ -55,9 +70,17 @@ useHead(() => ({
   link: [
     { rel: "canonical", href: pageUrl.value },
     { rel: "preconnect", href: "https://your-api.com" },
-    { rel: "preconnect", href: "https://cdn.example.com", crossorigin: "anonymous" },
+    {
+      rel: "preconnect",
+      href: "https://cdn.example.com",
+      crossorigin: "anonymous",
+    },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
-    { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
+    {
+      rel: "preconnect",
+      href: "https://fonts.gstatic.com",
+      crossorigin: "anonymous",
+    },
     { rel: "dns-prefetch", href: "https://your-api.com" },
     { rel: "dns-prefetch", href: "https://cdn.example.com" },
     { rel: "dns-prefetch", href: "https://fonts.googleapis.com" },
@@ -65,58 +88,98 @@ useHead(() => ({
 }));
 
 onMounted(() => {
-  fetchBlog()
-  AOS.init()
+  fetchBlog();
+  AOS.init();
 });
 </script>
 
 
 <template>
-    <NuxtLayout name="support">
+  <NuxtLayout name="support">
     <article
-    class="max-w-4xl px-6 pb-24 mx-auto space-y-12 dark:bg-gray-100 dark:text-gray-900"
+      class="max-w-4xl px-6 pb-24 mx-auto space-y-12 dark:bg-gray-100 dark:text-gray-900"
     >
-    <Navbar />
-    <div
-      v-if="loading"
-      class="text-center text-lg font-semibold text-gray-600 dark:text-gray-400"
-    >
-      Loading blog...
-    </div>
-    <div v-else-if="error" class="text-center text-red-500 font-medium" data-aos="fade-down" data-aos-delay="400">
-      {{ error }}
-    </div>
-    <div v-else>
-      <div class="w-full mx-auto space-y-4 text-center">
-        <img :src="blog.coverImage" alt="blog.title" />
-        <h1 class="text-4xl font-bold leading-tight md:text-5xl font-oswald">
-          {{ blog.title }}
-        </h1>
-        <p class="text-sm dark:text-gray-600">
-          by
-          <a
-            rel="noopener noreferrer"
-            href="#"
-            target="_blank"
-            class="underline dark:text-violet-600"
+      <Navbar />
+      <div
+        v-if="loading"
+        class="text-center text-lg font-semibold text-gray-600 dark:text-gray-400"
+      >
+        Loading blog...
+      </div>
+      <div
+        v-else-if="error"
+        class="text-center text-red-500 font-medium"
+        data-aos="fade-down"
+        data-aos-delay="400"
+      >
+        {{ error }}
+      </div>
+      <div v-else>
+        <NuxtLink
+          to="/blogs"
+          class="relative inline-flex items-center justify-center px-8 py-2.5 overflow-hidden tracking-tighter text-white bg-gray-800 rounded-md group"
+        >
+          <span
+            class="absolute w-0 h-0 transition-all duration-500 ease-out bg-orange-600 rounded-full group-hover:w-56 group-hover:h-56"
+          ></span>
+          <span class="absolute bottom-0 left-0 h-full -ml-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-auto h-full opacity-100 object-stretch"
+              viewBox="0 0 487 487"
+            >
+              <path
+                fill-opacity=".1"
+                fill-rule="nonzero"
+                fill="#FFF"
+                d="M0 .3c67 2.1 134.1 4.3 186.3 37 52.2 32.7 89.6 95.8 112.8 150.6 23.2 54.8 32.3 101.4 61.2 149.9 28.9 48.4 77.7 98.8 126.4 149.2H0V.3z"
+              ></path>
+            </svg>
+          </span>
+          <span class="absolute top-0 right-0 w-12 h-full -mr-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="object-cover w-full h-full"
+              viewBox="0 0 487 487"
+            >
+              <path
+                fill-opacity=".1"
+                fill-rule="nonzero"
+                fill="#FFF"
+                d="M487 486.7c-66.1-3.6-132.3-7.3-186.3-37s-95.9-85.3-126.2-137.2c-30.4-51.8-49.3-99.9-76.5-151.4C70.9 109.6 35.6 54.8.3 0H487v486.7z"
+              ></path>
+            </svg>
+          </span>
+          <span
+            class="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-200"
+          ></span>
+          <span class="relative text-base font-semibold">Retourner a la page des blogs</span>
+        </NuxtLink>
+
+        <div class="w-full mx-auto space-y-4 text-center">
+          <img :src="blog.coverImage" alt="blog.title" />
+          <h1 class="text-4xl font-bold leading-tight md:text-5xl font-oswald">
+            {{ blog.title }}
+          </h1>
+        </div>
+        <Divider />
+        <div
+          class="blog-content dark:text-gray-800 font-roboto"
+          v-html="blog.content"
+        ></div>
+        <Divider />
+        <p class="justify-self-center text-2xl text-black mt-10">
+          POUR LES MEILLEURS ABONNEMENTS IPTV EN 2025 VISITEZ
+          <nuxt-link
+            to="/produits"
+            class="text-purple-500 underline hover:text-purple-900"
+            style="justify-content: center"
           >
-            <span itemprop="name">{{ blog.author || "Unknown Author" }}</span>
-          </a>
-          on
-          <time :datetime="blog.createdAt">
-            {{ new Date(blog.createdAt).toLocaleDateString() }}
-          </time>
+            ABONNEMENTS PLATINIUM-IPTV
+          </nuxt-link>
         </p>
       </div>
-      <Divider />
-      <div class="blog-content dark:text-gray-800" v-html="blog.content"></div>
-      <Divider />
-      <p class=" justify-self-center text-2xl text-black mt-10">
-        POUR LES MEILLEURS ABONNEMENTS IPTV EN 2025 VISITEZ
-        <nuxt-link to="/produits" class=" text-purple-500 underline hover:text-purple-900"> ABONNEMENTS PLATINIUM-IPTV </nuxt-link>
-      </p>
-    </div>
-  </article>
+    </article>
   </NuxtLayout>
 </template>
 
@@ -195,7 +258,6 @@ onMounted(() => {
   font-weight: bold !important;
 }
 
-
 /* Reapply necessary styling */
 .blog-content {
   font-family: inherit !important;
@@ -224,7 +286,25 @@ onMounted(() => {
   font-weight: bold !important;
 }
 
-.blog-content.dark\:text-gray-800{
-    place-items: flex-start;
+.blog-content.dark\:text-gray-800 {
+  place-items: flex-start;
+}
+
+.blog-content a {
+  color: #6b46c1 !important;
+  text-decoration: underline;
+}
+
+.blog-content a:hover {
+  color: #4c2885 !important;
+}
+
+/* Dark Mode Fix */
+.dark .blog-content a {
+  color: #a78bfa !important;
+}
+
+.dark .blog-content a:hover {
+  color: #d8b4fe !important;
 }
 </style>
