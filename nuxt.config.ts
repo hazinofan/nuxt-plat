@@ -1,6 +1,7 @@
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
+  ssr:false,
   vite: {
     build: {
       rollupOptions: {
@@ -16,6 +17,7 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
+    preset: 'netlify',
     compressPublicAssets: true, 
   },
   app:{
@@ -33,7 +35,6 @@ export default defineNuxtConfig({
       ]
     }
   },
-  compatibilityDate: '2024-04-03',
   css: ['~/assets/css/main.css','primeicons/primeicons.css'],
   devtools: { enabled: true },
   modules: [
