@@ -1,7 +1,7 @@
 import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
-  ssr:false,
+  ssr: false,
   vite: {
     build: {
       rollupOptions: {
@@ -17,15 +17,15 @@ export default defineNuxtConfig({
     },
   },
   nitro: {
-    preset: 'netlify',
-    compressPublicAssets: true, 
+    preset: 'netlify-edge', // ✅ Use 'netlify-edge' instead of 'netlify' or 'netlify-legacy'
+    compressPublicAssets: true,
   },
-  app:{
-    head:{
+  app: {
+    head: {
       htmlAttrs: {
-        lang: "fr", 
+        lang: "fr",
       },
-      title:"Platinium IPTV",
+      title: "Platinium IPTV",
       link: [
         { rel: 'icon', href: '/assets/favicon.png' },
         {
@@ -35,7 +35,7 @@ export default defineNuxtConfig({
       ]
     }
   },
-  css: ['~/assets/css/main.css','primeicons/primeicons.css'],
+  css: ['~/assets/css/main.css', 'primeicons/primeicons.css'],
   devtools: { enabled: true },
   modules: [
     '@primevue/nuxt-module',
@@ -43,11 +43,11 @@ export default defineNuxtConfig({
     '@nuxt/image'
   ],
   primevue: {
-      options: {
-          theme: {
-              preset: Aura
-          }
+    options: {
+      theme: {
+        preset: Aura
       }
+    }
   },
   postcss: {
     plugins: {
@@ -60,6 +60,6 @@ export default defineNuxtConfig({
     "@types": "./core/types",
     "@services": "./core/services",
     "@stores": "./stores",
-    "@modules":"./core/modules"
+    "@modules": "./core/modules"
   }
 })
