@@ -157,11 +157,10 @@ onMounted(fetchBlogs);
               :to="`/blogs/${blog.slug}`"
               class="block overflow-hidden group rounded-xl shadow-lg"
             >
-              <nuxt-img
+              <img
                 :src="blog.coverImage || 'https://via.placeholder.com/1080'"
                 :alt="blog.title"
                 preload
-                format="webp"
                 quality="80"
                 width="800"
                 height="450"
