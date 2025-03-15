@@ -218,10 +218,9 @@ useHead({
         >
       </div>
 
-      <!-- Toast Component for Notifications -->
-      <Toast />
-      <div class="fixed inset-0 flex justify-center items-center bg-opacity-50">
-        <ProgressSpinner v-if="loading" />
+      <!-- Loading Spinner Positioned Between Toggle and Movies -->
+      <div v-if="loading" class="loading-container">
+        <ProgressSpinner />
       </div>
 
       <div class="container" data-aos="fade-down" data-aos-delay="400">
@@ -260,9 +259,11 @@ useHead({
       </div>
 
       <Steps />
+
       <div class="movies-wrapper">
         <Movies :speed="20" />
       </div>
+
       <div class="footer-spacing"></div>
       <Footer />
     </NuxtLayout>
@@ -285,5 +286,12 @@ useHead({
 .switch-label {
   font-size: 1rem;
   font-weight: 500;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0; 
 }
 </style>
