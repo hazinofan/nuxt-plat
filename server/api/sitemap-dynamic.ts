@@ -12,18 +12,23 @@ export default defineEventHandler(async () => {
     const productsResponse = await fetch(`${apiUrl}/products`);
     const products = await productsResponse.json();
 
+    // Get current date in the correct format
+    const formatDate = (date: string | Date) => {
+      return new Date(date).toISOString(); // ✅ Converts to valid format
+    };
+
     // Convert blogs to sitemap format
     const blogRoutes = blogs.map((blog: any) => ({
       loc: `/blogs/${blog.slug}`,
-      lastmod: new Date().toISOString(),
-      images: blog.coverImage ? [{ loc: blog.coverImage }] : [],  
+      lastmod: blog.updatedAt ? formatDate(blog.updatedAt) : formatDate(new Date()), // ✅ Ensure valid date
+      images: blog.coverImage ? [{ loc: blog.coverImage }] : [], // Include blog images if available
     }));
 
     // Convert products to sitemap format
     const productRoutes = products.map((product: any) => ({
       loc: `/products/${product.slug}`,
-      lastmod: new Date().toISOString(),
-      images: product.photos ? [{ loc: product.photos }] : [],
+      lastmod: product.updatedAt ? formatDate(product.updatedAt) : formatDate(new Date()), // ✅ Ensure valid date
+      images: product.photos ? [{ loc: product.photos }] : [], // Include product images if available
     }));
 
     return [...blogRoutes, ...productRoutes];
