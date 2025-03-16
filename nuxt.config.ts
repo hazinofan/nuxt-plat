@@ -14,6 +14,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       ENGINE_URL: process.env.NUXT_PUBLIC_BACKEND_URL,
+      siteUrl: 'https://platinium-iptv.com', 
     },
   },
   nitro: {
@@ -40,8 +41,13 @@ export default defineNuxtConfig({
   modules: [
     '@primevue/nuxt-module',
     '@pinia/nuxt',
-    '@nuxt/image'
+    '@nuxt/image',
+    'nuxt-simple-sitemap'
   ],
+  sitemap: {
+    exclude: ['/dashboard/**'], 
+    dynamicUrlsApiEndpoint: '/api/sitemap-dynamic',
+  },
   primevue: {
     options: {
       theme: {
@@ -62,4 +68,4 @@ export default defineNuxtConfig({
     "@stores": "./stores",
     "@modules": "./core/modules"
   }
-})
+});
