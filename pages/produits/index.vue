@@ -221,6 +221,7 @@ useHead({
       <!-- Loading Spinner Positioned Between Toggle and Movies -->
       <div v-if="loading" class="loading-container">
         <ProgressSpinner />
+        <p class="mt-5 text-lg font-roboto"> Chargement des Produits, Veuillez patienter ...</p>
       </div>
 
       <div class="container" data-aos="fade-down" data-aos-delay="400">
@@ -290,8 +291,11 @@ useHead({
 
 .loading-container {
   display: flex;
+  flex-direction: column; /* ✅ Stack elements vertically */
   justify-content: center;
   align-items: center;
-  margin: 20px 0; 
+  margin: 20px 0;
+  text-align: center; /* Ensures text is centered */
 }
+
 </style>

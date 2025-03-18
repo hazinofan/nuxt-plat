@@ -4,31 +4,33 @@ export default defineEventHandler(async () => {
   try {
     const apiUrl = environement.ENGINE_URL;
 
-    // Fetch dynamic blogs
-    const blogsResponse = await fetch(`${apiUrl}/blogs`);
-    const blogs = await blogsResponse.json();
-
-    // Fetch dynamic products
-    const productsResponse = await fetch(`${apiUrl}/products`);
-    const products = await productsResponse.json();
-
-    // Get current date in the correct format
+    // Function to format dates correctly
     const formatDate = (date: string | Date) => {
-      return new Date(date).toISOString(); // ✅ Converts to valid format
+      return new Date(date).toISOString(); // Converts to YYYY-MM-DDThh:mm:ssZ format
     };
+
+    // Fetch blogs dynamically
+    const blogsResponse = await fetch(`${apiUrl}/blogs`).catch(() => null);
+    const blogs = blogsResponse && blogsResponse.ok ? await blogsResponse.json() : [];
+
+    // Fetch products dynamically
+    const productsResponse = await fetch(`${apiUrl}/products`).catch(() => null);
+    const products = productsResponse && productsResponse.ok ? await productsResponse.json() : [];
 
     // Convert blogs to sitemap format
     const blogRoutes = blogs.map((blog: any) => ({
       loc: `/blogs/${blog.slug}`,
       lastmod: blog.updatedAt ? formatDate(blog.updatedAt) : formatDate(new Date()), // ✅ Ensure valid date
-      images: blog.coverImage ? [{ loc: blog.coverImage }] : [], // Include blog images if available
+      images: blog.coverImage ? [{ loc: blog.coverImage }] : [], // ✅ Include images correctly
     }));
 
     // Convert products to sitemap format
     const productRoutes = products.map((product: any) => ({
       loc: `/products/${product.slug}`,
       lastmod: product.updatedAt ? formatDate(product.updatedAt) : formatDate(new Date()), // ✅ Ensure valid date
-      images: product.photos ? [{ loc: product.photos }] : [], // Include product images if available
+      images: Array.isArray(product.photos)
+        ? product.photos.map((photo: string) => ({ loc: photo })) // ✅ Properly handle multiple images
+        : product.photos ? [{ loc: product.photos }] : [], // ✅ Single image fallback
     }));
 
     return [...blogRoutes, ...productRoutes];

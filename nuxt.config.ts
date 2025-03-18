@@ -2,6 +2,11 @@ import Aura from '@primevue/themes/aura';
 
 export default defineNuxtConfig({
   ssr: false,
+  site: { 
+    url: 'https://platinium-iptv.com', 
+    name: 'PLATINIUM IPTV' 
+    }, 
+   
   vite: {
     build: {
       rollupOptions: {
@@ -14,11 +19,14 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       ENGINE_URL: process.env.NUXT_PUBLIC_BACKEND_URL,
-      siteUrl: 'https://platinium-iptv.com', 
+      siteUrl: 'https://platinium-iptv.com', // ✅ Correctly defined site URL
     },
   },
   nitro: {
-    preset: 'netlify-edge', 
+    prerender: {
+      routes: ['/produits', '/', '/test-gratuit', '/blogs', '/login'], // Add important SEO pages here
+    },
+    preset: 'netlify-edge',
     compressPublicAssets: true,
   },
   app: {
@@ -42,10 +50,10 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@pinia/nuxt',
     '@nuxt/image',
-    'nuxt-simple-sitemap'
+    'nuxt-simple-sitemap',
   ],
   sitemap: {
-    exclude: ['/dashboard/**'], 
+    exclude: ['/dashboard/**'],
     dynamicUrlsApiEndpoint: '/api/sitemap-dynamic',
   },
   primevue: {

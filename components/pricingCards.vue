@@ -5,7 +5,8 @@ import InputSwitch from "primevue/inputswitch";
 import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
-const cartItems = ref([]); 
+const cartItems = ref([]);
+const loading = ref(false);
 const isDouble = ref(false);
 const products = ref([]);
 
@@ -38,9 +39,8 @@ const addToCart = (product) => {
   });
 };
 
-
 onMounted(() => {
-  fetchCartItems(); 
+  fetchCartItems();
   window.addEventListener("storage", fetchCartItems);
 });
 
@@ -48,21 +48,25 @@ onUnmounted(() => {
   window.removeEventListener("storage", fetchCartItems);
 });
 
-
 // ✅ Fetch Products from API
 async function fetchProducts() {
+  loading.value = true;
   try {
     const response = await getProducts();
     products.value = response; // Store fetched products
   } catch (error) {
     console.error("Error fetching products:", error);
+  } finally {
+    loading.value = false;
   }
 }
 
 // ✅ Filter Products Based on Toggle Switch
 const displayedPlans = computed(() => {
   return products.value
-    .filter((product) => product.display === (isDouble.value ? "Double" : "Single"))
+    .filter(
+      (product) => product.display === (isDouble.value ? "Double" : "Single")
+    )
     .slice(0, 3); // Limit to 3 products
 });
 
@@ -92,9 +96,17 @@ onMounted(fetchProducts);
         </div>
       </div>
 
-      <!-- Pricing Grid -->
+      <!-- Show the loading spinner only when loading is true -->
+      <div v-if="loading" class="loading-container">
+        <ProgressSpinner />
+        <p class="mt-5 text-lg font-roboto">
+          Chargement des Produits, Veuillez patienter ...
+        </p>
+      </div>
+
+      <!-- Show products only when not loading -->
       <div
-        v-if="displayedPlans.length"
+        v-if="!loading && displayedPlans.length"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
       >
         <div
@@ -115,17 +127,18 @@ onMounted(fetchProducts);
             {{ plan.name }}
           </h2>
 
-          <img :src="plan.photos" :alt="plan.name">
+          <img :src="plan.photos" :alt="plan.name" />
 
           <div class="mb-6">
-            <span class="text-4xl font-bold text-purple-600 tracking-tight"
-              >€{{ plan.price }}</span
-            >
+            <span class="text-4xl font-bold text-purple-600 tracking-tight">
+              €{{ plan.price }}
+            </span>
             <span
               class="text-xl text-gray-500 line-through ml-2"
               v-if="plan.price_before"
-              >€{{ plan.price_before }}</span
             >
+              €{{ plan.price_before }}
+            </span>
           </div>
 
           <!-- Features List -->
@@ -150,15 +163,19 @@ onMounted(fetchProducts);
           </button>
         </div>
       </div>
-
-      <!-- Loading State -->
-      <div v-else class="text-center text-gray-500">Loading plans...</div>
     </div>
   </section>
 </template>
 
   
   <style scoped>
-/* Custom hover & transition effects */
+.loading-container {
+  display: flex;
+  flex-direction: column; /* ✅ Stack elements vertically */
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+  text-align: center; /* Ensures text is centered */
+}
 </style>
   
