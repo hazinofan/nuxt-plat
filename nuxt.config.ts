@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     prerender: {
       routes: ['/produits', '/', '/test-gratuit', '/blogs', '/login'], // Add important SEO pages here
     },
-    preset: 'netlify-edge',
+    preset: 'static',
     compressPublicAssets: true,
   },
   app: {

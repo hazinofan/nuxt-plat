@@ -1,7 +1,3 @@
 [build]
 command = "npm run build"
-publish = ".output" # not .output/public
-
-[[edge_functions]]
-path = "/*"
-function = "server"
+publish = ".output/public"
