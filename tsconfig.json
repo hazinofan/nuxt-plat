@@ -1,13 +1,4 @@
 {
-  "extends": "./.nuxt/tsconfig.json",
-  "compilerOptions": {
-    "strict": true,
-    "typeRoots": ["./types", "./node_modules/@types"]
-  },
-  "include": [
-    "nuxt.config.ts",
-    "types/**/*.d.ts",
-    "**/*.ts",
-    "**/*.vue"
-  ]
+  // https://nuxt.com/docs/guide/concepts/typescript
+  "extends": "./.nuxt/tsconfig.json"
 }

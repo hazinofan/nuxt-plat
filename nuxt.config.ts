@@ -1,4 +1,5 @@
 import Aura from '@primevue/themes/aura';
+import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   ssr: false,
@@ -77,7 +78,7 @@ export default defineNuxtConfig({
   alias: {
     "@core": "./core",
     "@types": "./core/types",
-    "@services": "./core/services",
+    "@services": "./coreservices",
     "@stores": "./stores",
     "@modules": "./core/modules"
   }
