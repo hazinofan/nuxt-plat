@@ -1,5 +1,4 @@
 import Aura from '@primevue/themes/aura';
-import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   ssr: false,
@@ -49,15 +48,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
     '@primevue/nuxt-module',
-    'nuxt-gtag',
     '@pinia/nuxt',
     '@nuxt/image',
     'nuxt-simple-sitemap',
   ],
-  gtag: {
-    enabled: process.env.NODE_ENV === 'production',
-    id: 'G-S4TPMSH0P7', 
-  },
   sitemap: {
     exclude: ['/dashboard/**'],
     dynamicUrlsApiEndpoint: '/api/sitemap-dynamic',
@@ -83,3 +77,4 @@ export default defineNuxtConfig({
     "@modules": "./core/modules"
   }
 });
+
